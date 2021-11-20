@@ -3,27 +3,30 @@
 ;
 %macro BiosPrint 1
 mov si, word %1
-%%ch_loop:
-	lodsb
-	or al, al
-	jz %%done
-	mov ah, 0x0e
-	int 0x10
-	jmp %%ch_loop
-%%done:
+call ch_loop
 %endmacro
 
 [ORG 0x7c00]
 
 	xor ax, ax
 	mov ds, ax
-	cld
+    cld
 
 	BiosPrint msg
 	BiosPrint msg
 
 hang:
 	jmp hang
+
+ch_loop:
+    lodsb
+    or al, al
+    jz done
+    mov ah, 0x0e
+    int 0x10
+    jmp ch_loop
+done:
+    ret
 
 msg db 'Hello asOS', 13, 10, 0
 
