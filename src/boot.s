@@ -3,14 +3,14 @@
 ;
 %macro BiosPrint 1
 mov si, word %1
-ch_loop:
+%%ch_loop:
 	lodsb
 	or al, al
-	jz done
+	jz %%done
 	mov ah, 0x0e
 	int 0x10
-	jmp ch_loop
-done:
+	jmp %%ch_loop
+%%done:
 %endmacro
 
 [ORG 0x7c00]
@@ -19,6 +19,7 @@ done:
 	mov ds, ax
 	cld
 
+	BiosPrint msg
 	BiosPrint msg
 
 hang:
