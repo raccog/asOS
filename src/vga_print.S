@@ -5,6 +5,12 @@
  *
  * Modified from https://wiki.osdev.org/Babystep4
  */
+hexstr:		.ascii "0123456789ABCDEF"
+outstr16:	.asciz "0x0000"
+reg16:		.word 0
+xpos:		.byte 0
+ypos:		.byte 0
+
 cprint:
 	push es	# preserve es
 
@@ -61,9 +67,4 @@ printreg16_loop:
 
 	ret
 
-hexstr:		.ascii "0123456789ABCDEF"
-outstr16:	.asciz "0x0000"
-reg16:		.word 0
-xpos:		.byte 0
-ypos:		.byte 0
 

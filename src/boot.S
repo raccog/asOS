@@ -15,6 +15,17 @@
 .section .text
 .global _boot_entry1
 _boot_entry1:
+	jmp _boot1_code
+
+hexstr:		.ascii "0123456789ABCDEF"
+outstr16:	.asciz "0x0000"
+reg16:		.word 0
+
+MSG_BOOT1:			.asciz "Running first bootloader"
+MSG_BOOT2_READ:		.asciz "Second bootloader read from disk"
+MSG_BOOT2_ERROR:	.asciz "Error while reading second bootloader from disk"
+
+_boot1_code:
 	/* set data and extra segment locations */
 	xor ax, ax
 	mov ds, ax
@@ -125,14 +136,6 @@ printreg16_loop:
 	call sprint
 	
 	ret
-
-hexstr:		.ascii "0123456789ABCDEF"
-outstr16:	.asciz "0x0000"
-reg16:		.word 0
-
-MSG_BOOT1:			.asciz "Running first bootloader"
-MSG_BOOT2_READ:		.asciz "Second bootloader read from disk"
-MSG_BOOT2_ERROR:	.asciz "Error while reading second bootloader from disk"
 
 .fill 510 - (. - _boot_entry1), 1, 0
 .word 0xaa55
