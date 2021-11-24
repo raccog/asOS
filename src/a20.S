@@ -1,9 +1,21 @@
+/*
+ * A20 line enable procedure
+ *
+ * Included in the second bootloader.
+ */
+ enable_a20:
 	/* check if a20 line is enabled */
+	mov si, offset a20_MSG_CHECKING
+	call sprint
+
 	call a20_check
 	cmp ax, 0
 	jnz a20_enabled
 
 	/* enable a20 line through BIOS */
+	mov si, offset a20_MSG_CHECKING_BIOS
+	call sprint
+
 	mov ax, 0x2403	# check for BIOS a20 support
 	int 0x15
 	jb a20_keycontroller
@@ -18,6 +30,9 @@
 	cmp al, 1
 	je a20_enabled
 
+	mov si, offset a20_MSG_SETTING_BIOS
+	call sprint
+
 	mov ax, 0x2401	# enable a20 gate
 	int 0x15
 	jb a20_keycontroller
@@ -30,6 +45,9 @@
 
 	/* enable a20 line through keyboard controller */
 a20_keycontroller:
+	mov si, offset a20_MSG_CHECKING_KEYBOARD
+	call sprint
+
 	call a20_wait
 	mov al, 0xad	# ad = disable first PS/2 port
 	out 0x64, al
@@ -39,6 +57,10 @@ a20_keycontroller:
 	out 0x64, al
 
 	call a20_wait2
+
+	mov si, offset a20_MSG_SETTING_KEYBOARD
+	call sprint
+
 	in al, 0x60		# read a20 status to ax
 	push ax			# push status to stack
 
@@ -65,9 +87,16 @@ a20_check_loop1:
 	loop a20_check_loop1
 
 a20_fast:
+	mov si, offset a20_MSG_CHECKING_FAST
+	call sprint
+
 	in al, 0x92		# read fast a20 gate register
 	cmp al, 2		# check if a20 is enabled
 	jne a20_enabled 
+
+	mov si, offset a20_MSG_SETTING_FAST
+	call sprint
+
 	or al, 2		# set a20 enable bit
 	and al, 0xfe	# ensure bit 0 is not set (used for fast reset)
 	out 0x92, al
@@ -81,15 +110,17 @@ a20_check_loop2:
 	loop a20_check_loop2
 
 	/* display error and halt, a20 line could not be enabled */
-	mov si, offset a20_err
+	mov si, offset a20_MSG_ERROR
 	call sprint
 
 	hlt
 
 	/* a20 line is enabled */
 a20_enabled:
-	mov si, offset a20_msg
+	mov si, offset a20_MSG_ENABLED
 	call sprint
+
+	ret
 
 /* runs a loop until the input buffer is clear */
 a20_wait:
@@ -135,5 +166,12 @@ a20_check_exit:
 	pop ds
 	ret
 
-a20_msg:	.asciz "a20 line is enabled"
-a20_err:	.asciz "a20 line coult not be enabled. Halting."
+a20_MSG_ENABLED:			.asciz "a20 line is enabled."
+a20_MSG_ERROR:				.asciz "a20 line could not be enabled. Halting."
+a20_MSG_CHECKING:			.asciz "Checking if the a20 line is already enabled."
+a20_MSG_CHECKING_BIOS:		.asciz "Checking a20 line status through BIOS."
+a20_MSG_SETTING_BIOS:		.asciz "Enabling a20 line through BIOS."
+a20_MSG_CHECKING_KEYBOARD:	.asciz "Checking a20 line status through keyboard controller."
+a20_MSG_SETTING_KEYBOARD:	.asciz "Enabling a20 line through keyboard controller."
+a20_MSG_CHECKING_FAST:		.asciz "Checking a20 line status through fast register."
+a20_MSG_SETTING_FAST:		.asciz "Enabling a20 line through fast register."

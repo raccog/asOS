@@ -6,8 +6,8 @@
 
 # special locations
 .equ first_bootloader, 0x7c00
-.equ second_bootloader, 0x7200
-.equ stack, 0x7000
+.equ second_bootloader, 0x7000
+.equ stack, 0x6e00
 
 # constants
 .equ sector_size, 0x200
@@ -38,18 +38,23 @@ _boot_entry1:
 	mov si, offset msg
 	call sprint
 
+	mov ah, 0x00
+	int 0x13
+
 	/* load second bootloader */
 	mov bx, second_bootloader
-	mov ah, 0x02
-	mov al, 0x01
-	mov ch, 0x00
-	mov cl, 0x02
-	pop dx
-	mov dh, 0x00
+	mov ah, 0x02	# read disk sectors
+	mov al, 0x02	# read 2 sectors
+	mov ch, 0x00	# cylinder 0
+	mov cl, 0x02	# sector 2
+	pop dx			# restore drive number
+	mov dh, 0x00	# drive head 0
 	int 0x13
-	jb bootloader_read_error
-	cmp al, 1
-	jne bootloader_read_error
+	jb bootloader_read_error	# error if CL==1
+	or ah, ah
+	jnz bootloader_read_error	# error if ah!=0
+	or al, al
+	jz bootloader_read_error	# error if al==0
 
 	mov si, offset read_msg
 	call sprint
