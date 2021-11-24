@@ -35,7 +35,7 @@ _boot_entry1:
 	int 0x10
 
 	/* print init message */
-	mov si, offset msg
+	mov si, offset MSG_BOOT1
 	call sprint
 
 	mov ah, 0x00
@@ -56,7 +56,7 @@ _boot_entry1:
 	or al, al
 	jz bootloader_read_error	# error if al==0
 
-	mov si, offset read_msg
+	mov si, offset MSG_BOOT2_READ
 	call sprint
 
 	jmp 0x0000:second_bootloader
@@ -64,7 +64,7 @@ _boot_entry1:
 	hlt
 
 bootloader_read_error:
-	mov si, offset read_err
+	mov si, offset MSG_BOOT2_ERROR
 	call sprint
 
 	hlt
@@ -126,12 +126,13 @@ printreg16_loop:
 	
 	ret
 
-msg:		.asciz "Running first bootloader"
-read_msg:	.asciz "Second bootloader read from disk"
-read_err:	.asciz "Error while reading second bootloader from disk"
 hexstr:		.ascii "0123456789ABCDEF"
 outstr16:	.asciz "0x0000"
 reg16:		.word 0
+
+MSG_BOOT1:			.asciz "Running first bootloader"
+MSG_BOOT2_READ:		.asciz "Second bootloader read from disk"
+MSG_BOOT2_ERROR:	.asciz "Error while reading second bootloader from disk"
 
 .fill 510 - (. - _boot_entry1), 1, 0
 .word 0xaa55
