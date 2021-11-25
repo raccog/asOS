@@ -1,7 +1,7 @@
 /*
  * Bootloader for always sunny OS (asOS)
  */
-.code16
+
 .intel_syntax noprefix
 
 # special locations
@@ -13,18 +13,23 @@
 .equ sector_size, 0x200
 
 .section .text
-.global _boot_entry1
+.global _boot_entry1	# export entry point to linker
+
+/* jump past data */
 _boot_entry1:
 	jmp _boot1_code
 
-hexstr:		.ascii "0123456789ABCDEF"
+# string buffers
 outstr16:	.asciz "0x0000"
 reg16:		.word 0
 
+# string constants
+hexstr:		.ascii "0123456789ABCDEF"
 MSG_BOOT1:			.asciz "Running first bootloader"
 MSG_BOOT2_READ:		.asciz "Second bootloader read from disk"
 MSG_BOOT2_ERROR:	.asciz "Error while reading second bootloader from disk"
 
+.code16		# 16-bit code 
 _boot1_code:
 	/* set data and extra segment locations */
 	xor ax, ax
@@ -49,7 +54,8 @@ _boot1_code:
 	mov si, offset MSG_BOOT1
 	call sprint
 
-	mov ah, 0x00
+	/* reset disk */
+	mov ah, 0x00	# reset disk
 	int 0x13
 
 	/* load second bootloader */
@@ -67,14 +73,17 @@ _boot1_code:
 	or al, al
 	jz bootloader_read_error	# error if al==0
 
+	/* print bootloader read success message */
 	mov si, offset MSG_BOOT2_READ
 	call sprint
 
+	/* jump to second bootloader */
 	jmp 0x0000:second_bootloader
 
 	hlt
 
 bootloader_read_error:
+	/* print bootloader read error message */
 	mov si, offset MSG_BOOT2_ERROR
 	call sprint
 
@@ -84,28 +93,28 @@ bootloader_read_error:
  * inputs: al = character 
  */
 cprint:
-	mov ah, 0x0e
-	mov bh, 0x0
-	mov bl, 0x0f
+	mov ah, 0x0e	# write character to teletype
+	mov bh, 0x0		# page 0
+	mov bl, 0x0f	# white on black attribute
 	int 0x10
 	ret
 
-/* prints a string located at si to tty
+/* prints a string located at ds:si to tty
  * inputs: si = string location
  */
 sprint:
-	lodsb			# al = *si
+	lodsb			# load byte from ds:si
 	cmp al, 0		# if (al == 0)
 	je sprint_done	# return
 	call cprint		# print character in al
 	jmp sprint		# restart loop
 sprint_done:
-	call nlprint
+	call nlprint	# print new line
 	ret
 
 /* prints a new line to tty */
 nlprint:
-	mov al, 13
+	mov al, 13 
 	call cprint
 	mov al, 10
 	call cprint
@@ -118,24 +127,24 @@ nlprint:
  * modified from https://wiki.osdev.org/Babystep5
  */
 printreg16:
-	mov di, offset outstr16 + 2
-	mov ax, [reg16]
-	mov si, offset hexstr
-	mov cx, 4
+	mov di, offset outstr16 + 2	# get offset of output buffer
+	mov ax, [reg16]				# move value into ax
+	mov si, offset hexstr		# get offset of hex character string
+	mov cx, 4					# 4 hex characters
 printreg16_loop:
-	rol ax, 4
-	mov bx, ax
-	and bx, 0x0f
+	rol ax, 4		# rotate left-most 4-bits to the right-most 4-bits
+	mov bx, ax		# copy ax to bx
+	and bx, 0x0f	# extract right-most 4-bits
 	mov bl, [si + bx]
-	mov [di], bl
-	inc di
-	dec cx
-	jnz printreg16_loop
+	mov [di], bl	# copy hex character to output buffer
+	inc di			# move to next output character
+	loop printreg16_loop
 
 	mov si, offset outstr16
-	call sprint
+	call sprint		# print output buffer
 	
 	ret
 
+/* fill with zeros until MBR signature */
 .fill 510 - (. - _boot_entry1), 1, 0
-.word 0xaa55
+.word 0xaa55	# MBR signature

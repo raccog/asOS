@@ -5,11 +5,15 @@
  *
  * Modified from https://wiki.osdev.org/Babystep4
  */
-hexstr:		.ascii "0123456789ABCDEF"
+
+# data
 outstr16:	.asciz "0x0000"
 reg16:		.word 0
 xpos:		.byte 0
 ypos:		.byte 0
+
+# string constant
+hexstr:		.ascii "0123456789ABCDEF"
 
 cprint:
 	push es	# preserve es
@@ -40,30 +44,30 @@ cprint:
 sprint_dochar:
 	call cprint
 sprint:
-	lodsb
+	lodsb					# load byte from ds:si
 	or al, al
-	jnz sprint_dochar
-	add byte ptr [ypos], 1
-	mov byte ptr [xpos], 0
+	jnz sprint_dochar		# if al!=0 print next character
+	add byte ptr [ypos], 1	# move to next row
+	mov byte ptr [xpos], 0	# reset column to 0
 
 	ret
 
 printreg16:
-	mov di, offset outstr16
-	mov ax, [reg16]
-	mov si, offset hexstr + 2
-	mov cx, 4	# 4 hex digits
+	mov di, offset outstr16 + 2	# get offset of output buffer
+	mov ax, [reg16]				# move value into ax
+	mov si, offset hexstr		# get offset of character string
+	mov cx, 4					# 4 hex characters
 printreg16_loop:
-	rol ax, 4		# rotate hex values
-	mov bx, ax
-	and bx, 0x0f	# extract last hex value
-	mov bl, [si + bx] # get hex ascii character
-	mov [di], bl	# output hex ascii character
-	inc di
+	rol ax, 4		# rotate left-most 4-bits to the right-most 4-bits
+	mov bx, ax		# copy ax to bx
+	and bx, 0x0f	# extract right-most 4-bits
+	mov bl, [si + bx]
+	mov [di], bl	# copy hex character to output buffer
+	inc di			# move to next output character
 	loop printreg16_loop
 
 	mov si, outstr16
-	call sprint
+	call sprint		# print output buffer
 
 	ret
 

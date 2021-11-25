@@ -4,6 +4,7 @@
  * Included in the second bootloader.
  */
 
+# string constants
 a20_MSG_ENABLED:			.asciz "a20 line is enabled."
 a20_MSG_ERROR:				.asciz "a20 line could not be enabled. Halting."
 a20_MSG_CHECKING:			.asciz "Checking if the a20 line is already enabled."
@@ -14,110 +15,111 @@ a20_MSG_SETTING_KEYBOARD:	.asciz "Enabling a20 line through keyboard controller.
 a20_MSG_CHECKING_FAST:		.asciz "Checking a20 line status through fast register."
 a20_MSG_SETTING_FAST:		.asciz "Enabling a20 line through fast register."
 
+/* call to enable a20 line */
 enable_a20:
 	/* check if a20 line is enabled */
 	mov si, offset a20_MSG_CHECKING
-	call sprint
+	call sprint		# print status
 
-	call a20_check
-	cmp ax, 0
-	jnz a20_enabled
+	call a20_check	# test a20 line
+	or ax, ax
+	jnz a20_enabled	# if ax!=0 a20 enabled
 
 	/* enable a20 line through BIOS */
 	mov si, offset a20_MSG_CHECKING_BIOS
-	call sprint
+	call sprint		# print status
 
 	mov ax, 0x2403	# check for BIOS a20 support
 	int 0x15
-	jb a20_keycontroller
-	cmp ah, 0
-	jnz a20_keycontroller
+	jb a20_keycontroller	# if CF==1 no support
+	or ah, ah
+	jnz a20_keycontroller	# if ah!=0 no support
 
 	mov ax, 0x2402	# check a20 gate status
 	int 0x15
-	jb a20_keycontroller
-	cmp ah, 0
-	jnz a20_keycontroller
+	jb a20_keycontroller	# if CF==1 BIOS error
+	or ah, ah
+	jnz a20_keycontroller	# if ah!=0 BIOS error
 	cmp al, 1
-	je a20_enabled
+	je a20_enabled			# if al==1 a20 enabled
 
 	mov si, offset a20_MSG_SETTING_BIOS
-	call sprint
+	call sprint		# print status
 
 	mov ax, 0x2401	# enable a20 gate
 	int 0x15
-	jb a20_keycontroller
-	cmp ah, 0
-	jnz a20_keycontroller
+	jb a20_keycontroller	# if CF==1 BIOS error
+	or ah, ah
+	jnz a20_keycontroller	# if ah!=0 BIOS error
 
-	call a20_check	# check if a20 gate is enabled without BIOS
-	cmp ax, 0
-	jnz a20_enabled
+	call a20_check	# test a20 gate without BIOS
+	or ax, ax
+	jnz a20_enabled	# if ax!=0 a20 enabled
 
 	/* enable a20 line through keyboard controller */
 a20_keycontroller:
 	mov si, offset a20_MSG_CHECKING_KEYBOARD
-	call sprint
+	call sprint		# print status
 
-	call a20_wait
+	call a20_wait	# test a20 line
 	mov al, 0xad	# ad = disable first PS/2 port
-	out 0x64, al
+	out 0x64, al	# write ps2 command
 
-	call a20_wait
+	call a20_wait	# test a20 line
 	mov al, 0xd0	# d0 = read controller output port
-	out 0x64, al
+	out 0x64, al	# write ps2 command
 
-	call a20_wait2
+	call a20_wait2	# test a20 line
 
 	mov si, offset a20_MSG_SETTING_KEYBOARD
-	call sprint
+	call sprint		# print status
 
 	in al, 0x60		# read a20 status to ax
 	push ax			# push status to stack
 
-	call a20_wait
+	call a20_wait	# test a20 line
 	mov al, 0xd1	# d1 = write to controller output port
-	out 0x64, al
+	out 0x64, al	# write ps2 command
 	
-	call a20_wait
+	call a20_wait	# test a20 line
 	pop ax			# pop a20 status
 	or al, 2		# set bit to enable a20 line
-	out 0x60, al
+	out 0x60, al	# write ps2 data
 
-	call a20_wait
+	call a20_wait	# test a20 line
 	mov al, 0xae	# ae = enable first PS/2 port
-	out 0x64, al
+	out 0x64, al	# write ps2 command
 
-	call a20_wait
+	call a20_wait	# test a20 line
 
 	mov cx, 0xff
 a20_check_loop1:
-	call a20_check	# check a20 line 256 times
-	cmp ax, 0
-	jnz a20_enabled
+	call a20_check	# test a20 line 256 times
+	or ax, ax
+	jnz a20_enabled	# if ax!=0 a20 enabled
 	loop a20_check_loop1
 
 a20_fast:
 	mov si, offset a20_MSG_CHECKING_FAST
-	call sprint
+	call sprint		# print status
 
 	in al, 0x92		# read fast a20 gate register
-	cmp al, 2		# check if a20 is enabled
-	jne a20_enabled 
+	cmp al, 2		# check if a20 bit is set
+	jne a20_enabled
 
 	mov si, offset a20_MSG_SETTING_FAST
-	call sprint
+	call sprint		# print status
 
 	or al, 2		# set a20 enable bit
 	and al, 0xfe	# ensure bit 0 is not set (used for fast reset)
-	out 0x92, al
+	out 0x92, al	# write to fast a20 gate register
 
 a20_fast_done:
 	mov cx, 0xff
 a20_check_loop2:
 	call a20_check	# check a20 line 256 times
-	cmp ax, 0
-	jnz a20_enabled
+	or ax, ax
+	jnz a20_enabled	# if ax!=0 a20 enabled
 	loop a20_check_loop2
 
 	/* display error and halt, a20 line could not be enabled */
@@ -129,7 +131,7 @@ a20_check_loop2:
 	/* a20 line is enabled */
 a20_enabled:
 	mov si, offset a20_MSG_ENABLED
-	call sprint
+	call sprint		# print enabled message
 
 	ret
 
@@ -155,24 +157,24 @@ a20_wait2:
  * modified from https://wiki.osdev.org/A20_Line
  */
 a20_check:
-	push ds
+	push ds		# preserve ds
 
 	xor ax, ax
 	not ax
 	mov ds, ax	# ds = 0xffff
 
 	mov di, 0x500
-	mov si, 0x510
+	mov si, 0x510	# si offset by 64 bytes
 
-	es mov byte ptr [di], 0x00
-	ds mov byte ptr [si], 0xff
+	mov byte ptr es:[di], 0x00	# es:di = 0
+	mov byte ptr ds:[si], 0xff	# ds:si = ff
 
-	es cmp byte ptr [di], 0xff
+	cmp byte ptr es:[di], 0xff
 
 	mov ax, 0
-	je a20_check_exit
+	je a20_check_exit	# if es:di==ff return 0
 
-	mov ax, 1
+	mov ax, 1			# if es:di!=ff return 1
 a20_check_exit:
-	pop ds
+	pop ds		# restore ds
 	ret
