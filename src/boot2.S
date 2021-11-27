@@ -3,6 +3,8 @@
  */
 .intel_syntax noprefix
 
+.equ stack, 0x6e00
+
 .section .text
 
 .code16		# 16-bit code
@@ -65,7 +67,29 @@ _boot2_code:
 	mov si, offset MSG_SET_GDT
 	call sprint
 
-	/* run C hook */
+	/* enter protected mode */
+	mov eax, cr0
+	or eax, 1
+	mov cr0, eax
+
+	/* set segment registers */
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
+
+	/* set stack */
+	mov esp, stack
+
+	/* clear instruction pipeline */
+	jmp 8:clear_pipeline
+
+.code32
+clear_pipeline:
+
+	/* call C hook */
 	call bootloader_main
 
 	hlt
