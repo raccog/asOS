@@ -15,6 +15,7 @@ SECTIONS {
 
 	.boot2 0x7000 : AT(SIZEOF(.boot1))  {
 		boot2.o(.text)
+		pmode.o(.text)
 		bootloader.o(.text .rodata .data .bss)
 	} > boot2
 

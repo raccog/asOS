@@ -1,5 +1,5 @@
 /*
- * VGA print functions for second bootloader
+ * VGA print functions in real mode for second bootloader
  *
  * Included in the second bootloader.
  *
@@ -21,7 +21,7 @@ cprint:
 	mov dx, 0xb800
 	mov es, dx		# es = start of VGA memory
 
-	mov ah, 0x0f	# attribute = white on black
+	mov ah, 0x07	# attribute = white on black
 	mov cx, ax		# save word/attribute
 	movzx ax, byte ptr [ypos]
 	mov dx, 160		# 2 bytes (char/attribute)

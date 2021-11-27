@@ -3,7 +3,6 @@
  */
 .intel_syntax noprefix
 
-.equ stack, 0x6e00
 
 .section .text
 
@@ -48,11 +47,10 @@ gdt_end:
 
 # string constants
 MSG_SET_GDT:	.asciz "Set the GDT."
-MSG_PMODE:		.asciz "Entered into protected mode."
 
 # include procedures
 .include "src/a20.S"
-.include "src/vga_print.S"
+.include "src/vga_print_rmode.S"
 
 /* entry point */
 _boot2_code:
@@ -76,23 +74,6 @@ _boot2_code:
 	mov cr0, eax
 
 	/* clear instruction pipeline */
-	jmp 0x8:clear_pipeline
-
-.code32
-clear_pipeline:
-	/* set segment registers */
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov ss, ax
-
-	/* set stack */
-	mov esp, stack
-
-	mov si, offset MSG_PMODE
-	call sprint
-
-	/* call C hook */
-	#call bootloader_main
+	jmp 0x8:begin_pmode
 
 	hlt
