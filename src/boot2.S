@@ -65,4 +65,7 @@ _boot2_code:
 	mov si, offset MSG_SET_GDT
 	call sprint
 
+	/* run C hook */
+	call bootloader_main
+
 	hlt
