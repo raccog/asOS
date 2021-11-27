@@ -55,6 +55,7 @@ MSG_SET_GDT:	.asciz "Set the GDT."
 /* entry point */
 _boot2_code:
 	cld	# clear direction flag
+	cli
 
 	/* enable a20 line */
 	mov byte ptr [ypos], 2	# manually set row
@@ -69,27 +70,24 @@ _boot2_code:
 
 	/* enter protected mode */
 	mov eax, cr0
-	or eax, 1
+	or al, 1
 	mov cr0, eax
 
+	/* clear instruction pipeline */
+	jmp 0x8:clear_pipeline
+
+.code32
+clear_pipeline:
 	/* set segment registers */
 	mov ax, 0x10
 	mov ds, ax
 	mov es, ax
-	mov fs, ax
-	mov gs, ax
 	mov ss, ax
 
 	/* set stack */
 	mov esp, stack
 
-	/* clear instruction pipeline */
-	jmp 8:clear_pipeline
-
-.code32
-clear_pipeline:
-
 	/* call C hook */
-	call bootloader_main
+	#call bootloader_main
 
 	hlt
