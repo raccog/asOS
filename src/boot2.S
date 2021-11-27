@@ -19,13 +19,14 @@ _second_boot_entry:
 
 /* global table descriptor register */
 gdtr:
-	.word gdt_start - gdt_end	# size = 4 entries * 8 bytes each
-	.int gdt_start				# offset = address of GDT
+	.word gdt_end - gdt_start - 1	# size = 4 entries * 8 bytes each
+	.long gdt_start					# offset = address of GDT
 
 /* global descriptor table */
 .align 8	# align GDT to 8 byte boundary
 gdt_start:
 # null descriptor
+	.long 0
 	.long 0
 # code descriptor
 	.word 0xffff		# limit 0-15
@@ -47,6 +48,7 @@ gdt_end:
 
 # string constants
 MSG_SET_GDT:	.asciz "Set the GDT."
+MSG_PMODE:		.asciz "Entered into protected mode."
 
 # include procedures
 .include "src/a20.S"
@@ -86,6 +88,9 @@ clear_pipeline:
 
 	/* set stack */
 	mov esp, stack
+
+	mov si, offset MSG_PMODE
+	call sprint
 
 	/* call C hook */
 	#call bootloader_main
