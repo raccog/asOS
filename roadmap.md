@@ -2,6 +2,10 @@
 
 ## bootloader
 
+The bootloader does only two things:
+* Enables system features
+* Gathers system information to pass to the kernel
+
 ### major
 
 - [x] start i386 BIOS
@@ -10,11 +14,6 @@
 - [ ] start x86_64 UEFI
 - [ ] start armv6
 - [ ] start riscv
-- [ ] command line
-- [ ] output register command
-- [ ] output memory command
-- [ ] query system features command
-- [ ] system dump over serial command
 
 ### minor
 
@@ -30,5 +29,11 @@
 
 ## kernel
 
-- [ ] kernel boot procedure
+### major
+
 - [ ] kernel main in C
+- [ ] command line
+- [ ] output register command
+- [ ] output memory command
+- [ ] query system features command
+- [ ] system dump over serial command
