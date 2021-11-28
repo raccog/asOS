@@ -14,22 +14,25 @@ fi
 mkdir $PREFIX
 cd $PREFIX
 
+if [[ ! -d src ]]; then
+
 # Move to src dir
-mkdir src
-cd src
+	mkdir src
+	cd src
 
 # Download binutils and gcc
-echo "Downloading binutils and gcc."
-curl -O "https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.gz"
-curl -O "https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.gz"
+	echo "Downloading binutils and gcc."
+	curl -O "https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.gz"
+	curl -O "https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.gz"
 
 # Extract binutils and gcc
-echo "Extracting binutils and gcc to directory $PREFIX/src."
-tar xf "binutils-2.37.tar.gz"
-tar xf "gcc-11.2.0.tar.gz"
+	echo "Extracting binutils and gcc to directory $PREFIX/src."
+	tar xf "binutils-2.37.tar.gz"
+	tar xf "gcc-11.2.0.tar.gz"
+	cd ..
+fi
 
 # Move to target build dir
-cd ..
 mkdir build
 cd build
 
