@@ -23,12 +23,12 @@ This command line will run in the kernel and will read system information passed
 
 As the kernel of asOS relies on the custom bootloader, the bootloader needs to be updated for each supported architecture. 
 
-Currently, the only bootloader is for i386 BIOS, but others are planned to be supported in the future. 
+Currently, the only bootloader is for i686 BIOS, but others are planned to be supported in the future. 
 
 The following list includes all architectures that I want to support:
-* i386 BIOS
-* i386 UEFI
+* i686 BIOS
+* i686 UEFI
 * x86_64 BIOS
 * x86_64 UEFI
-* armv6 (32-bit raspberry pi)
+* arm (32-bit raspberry pi)
 * riscv (32-bit)

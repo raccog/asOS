@@ -8,11 +8,11 @@ The bootloader does only two things:
 
 ### major
 
-- [x] start i386 BIOS
-- [ ] start i386 UEFI
+- [x] start i686 BIOS
+- [ ] start i686 UEFI
 - [ ] start x86_64 BIOS
 - [ ] start x86_64 UEFI
-- [ ] start armv6
+- [ ] start arm
 - [ ] start riscv
 
 ### minor
