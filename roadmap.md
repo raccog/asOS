@@ -8,7 +8,7 @@
 - [x] setup gdt
 - [ ] load idtr
 - [ ] setup idt
-- [ ] switch to protected mode
+- [x] switch to protected mode
 - [ ] setup stack
 - [ ] bootloader main in C
 
