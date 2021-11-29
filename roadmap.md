@@ -39,6 +39,7 @@ The step after this will likely be implementing basic processes, but that could 
 
 - [ ] kernel main in C
 - [ ] command line
+- [ ] keyboard input
 - [ ] output register command
 - [ ] output memory command
 - [ ] query system features command
