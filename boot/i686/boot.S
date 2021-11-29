@@ -26,19 +26,19 @@ reg16:		.word 0
 # string constants
 hexstr:		.ascii "0123456789ABCDEF"
 MSG_BOOT1:			.asciz "Running first bootloader"
-MSG_BOOT2_READ:		.asciz "Second bootloader read from disk"
 MSG_BOOT2_ERROR:	.asciz "Error while reading second bootloader from disk"
 
 .code16		# 16-bit code 
 _boot1_code:
-	/* set data and extra segment locations */
+	/* set segment locations */
 	xor ax, ax
 	mov ds, ax
 	mov es, ax
+	mov fs, ax
+	mov gs, ax
 
 	/* set stack segment and pointer */
 	cli		# disable interrupts
-	xor ax, ax
 	mov ss, ax	
 	mov sp, stack	# set stack
 
@@ -72,10 +72,6 @@ _boot1_code:
 	jnz bootloader_read_error	# error if ah!=0
 	or al, al
 	jz bootloader_read_error	# error if al==0
-
-	/* print bootloader read success message */
-	mov si, offset MSG_BOOT2_READ
-	call sprint
 
 	/* jump to second bootloader */
 	jmp 0x0000:second_bootloader
@@ -118,31 +114,6 @@ nlprint:
 	call cprint
 	mov al, 10
 	call cprint
-	ret
-	
-
-/* prints the value of reg16 to tty as a 16-bit hex value
- * inputs: reg16 = value
- *
- * modified from https://wiki.osdev.org/Babystep5
- */
-printreg16:
-	mov di, offset outstr16 + 2	# get offset of output buffer
-	mov ax, [reg16]				# move value into ax
-	mov si, offset hexstr		# get offset of hex character string
-	mov cx, 4					# 4 hex characters
-printreg16_loop:
-	rol ax, 4		# rotate left-most 4-bits to the right-most 4-bits
-	mov bx, ax		# copy ax to bx
-	and bx, 0x0f	# extract right-most 4-bits
-	mov bl, [si + bx]
-	mov [di], bl	# copy hex character to output buffer
-	inc di			# move to next output character
-	loop printreg16_loop
-
-	mov si, offset outstr16
-	call sprint		# print output buffer
-	
 	ret
 
 /* fill with zeros until MBR signature */
