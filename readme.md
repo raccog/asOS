@@ -15,7 +15,7 @@ In the far future, there will be a GUI/window manager, but for now the goal for 
 
 ## Current Major Goal
 
-The current major goal of this OS is to get a command line running that has a few commands for dumping system information. System information should be shown on the monitor when short enough, and dumped to serial output when long. 
+The current major goal of this OS is to get a command line running that has a few commands for viewing registers/memory/system info.
 
 This command line will run in the kernel and will read system information passed by the bootloader.
 

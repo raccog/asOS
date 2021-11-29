@@ -11,8 +11,10 @@ This document contains a list of all features that are detected by the bootloade
 * x87 FPU
 * CPUID
 * Amount of memory
+* PCI
 * PCIe
 * ACPI
+* ATA
 
 ### arm
 

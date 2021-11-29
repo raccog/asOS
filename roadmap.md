@@ -25,9 +25,15 @@ The bootloader does only two things:
 - [ ] setup idt
 - [x] switch to protected mode
 - [ ] setup stack
-- [ ] bootloader main in C
 
 ## kernel
+
+The first step I want to take in building the kernel is a command line with a few commands:
+* output register/memory
+* query system features
+* system dump over serial/VGA
+
+The step after this will likely be implementing basic processes, but that could change.
 
 ### major
 
@@ -37,3 +43,4 @@ The bootloader does only two things:
 - [ ] output memory command
 - [ ] query system features command
 - [ ] system dump over serial command
+- [ ] system dump over VGA command
