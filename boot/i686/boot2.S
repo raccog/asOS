@@ -43,30 +43,30 @@ gdt_start:
 	.byte 0				# base 24-31
 # empty TSS descriptor
 	.long 0
+	.long 0
 gdt_end:
 
 # string constants
-MSG_SET_GDT:	.asciz "Set the GDT."
+MSG_BOOT2:	.asciz "Running second bootloader."
 
 # include procedures
-.include "src/a20.S"
-.include "src/vga_print_rmode.S"
+.include "boot/i686/a20.S"
+.include "boot/i686/vga_print_rmode.S"
 
 /* entry point */
 _boot2_code:
 	cld	# clear direction flag
-	cli
+	cli	# clear interrupt flag
+
+	/* print init message */
+	mov esi, offset MSG_BOOT2
+	call sprint
 
 	/* enable a20 line */
-	mov byte ptr [ypos], 2	# manually set row
 	call enable_a20			# enable a20 line
 	
 	/* load GDT */
 	lgdt [gdtr]
-
-	/* print GDT load success message */
-	mov si, offset MSG_SET_GDT
-	call sprint
 
 	/* enter protected mode */
 	mov eax, cr0

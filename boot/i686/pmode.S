@@ -10,10 +10,10 @@
 .code32
 
 # string constants
-MSG_PMODE:		.asciz "Entered into protected mode."
+MSG_PMODE:		.asciz "Running second bootloader in protected mode."
 
 # include procedures
-.include "src/vga_print_pmode.S"
+.include "boot/i686/vga_print_pmode.S"
 
 .code32
 .global begin_pmode
@@ -27,12 +27,9 @@ begin_pmode:
 	/* set stack */
 	mov esp, stack
 
-	mov byte ptr [ypos], 5	# manually set row to 5
+	/* print init message */
 	mov esi, offset MSG_PMODE
 	call sprint
-
-	/* call C hook */
-	#call bootloader_main
 
 	hlt
 
