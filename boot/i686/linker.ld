@@ -3,7 +3,7 @@ ENTRY(_boot_entry1)
 MEMORY {
 
 	boot1 : o = 0x7c00, l = 0x200
-	boot2 : o = 0x7000, l = 3k
+	boot2 : o = 0x7000, l = 3K
 	
 }
 

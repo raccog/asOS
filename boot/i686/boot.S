@@ -61,7 +61,7 @@ _boot1_code:
 	/* load second bootloader */
 	mov bx, second_bootloader
 	mov ah, 0x02	# read disk sectors
-	mov al, 0x03	# read 3 sectors
+	mov al, 0x06	# read 6 sectors (3K)
 	mov ch, 0x00	# cylinder 0
 	mov cl, 0x02	# sector 2
 	pop dx			# restore drive number
