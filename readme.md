@@ -1,6 +1,6 @@
 # asOS
 
-asOS (always sunny Operating System) is a hobby OS project with a goal of creating a minimal kernel for desktop and mobile computers. 
+asOS (always sunny Operating System) is a hobby OS project with a goal of creating a minimal command line userland for desktop systems.
 
 My underlying goals for this project are to:
 * Learn about hardware features and concepts for a variety of architectures.
@@ -11,7 +11,7 @@ My underlying goals for this project are to:
 
 asOS is going to be split into a kernel and a bootloader. Each supported architecture will have its own custom bootloader that will pass information about the system to the kernel. 
 
-In the far future, there will be a GUI/window manager, but for now the goal for user interface is just a terminal. 
+In the far future, there may be a GUI/window manager, but for now the goal for user interface is just a terminal. 
 
 ## Current Major Goal
 
