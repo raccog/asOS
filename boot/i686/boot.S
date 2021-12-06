@@ -7,6 +7,7 @@
 # special locations
 .equ first_bootloader, 0x7c00
 .equ second_bootloader, 0x7000
+.equ kernel, 0x8000
 .equ stack, 0x6e00
 
 # constants
@@ -27,7 +28,9 @@ reg16:		.word 0
 hexstr:		.ascii "0123456789ABCDEF"
 MSG_BOOT1:			.asciz "Running first bootloader"
 MSG_BOOT2_ERROR:	.asciz "Error while reading second bootloader from disk"
+MSG_KERNEL_ERROR:   .asciz "Error while reading kernel from disk"
 
+.align 8
 .code16		# 16-bit code 
 _boot1_code:
 	/* set segment locations */
@@ -64,7 +67,7 @@ _boot1_code:
 	mov al, 0x06	# read 6 sectors (3K)
 	mov ch, 0x00	# cylinder 0
 	mov cl, 0x02	# sector 2
-	pop dx			# restore drive number
+	mov dx, [esp]	# restore drive number
 	mov dh, 0x00	# drive head 0
 	int 0x13
 	jb bootloader_read_error	# error if CL==1
@@ -72,6 +75,21 @@ _boot1_code:
 	jnz bootloader_read_error	# error if ah!=0
 	or al, al
 	jz bootloader_read_error	# error if al==0
+
+	/* load kernel */
+	mov bx, kernel
+	mov ah, 0x02	# read disk sectors
+	mov al, 0x10	# read 16 sectors (8K)
+	mov ch, 0x00	# cylinder 0
+	mov cl, 0x08	# sector 8
+	pop dx			# restore drive number
+	mov dh, 0x00	# drive head 0
+	int 0x13
+	jb kernel_read_error	# error if CL==1
+	or ah, ah
+	jnz kernel_read_error	# error if ah!=0
+	or al, al
+	jz kernel_read_error	# error if al==0
 
 	/* jump to second bootloader */
 	jmp 0x0000:second_bootloader
@@ -81,6 +99,13 @@ _boot1_code:
 bootloader_read_error:
 	/* print bootloader read error message */
 	mov si, offset MSG_BOOT2_ERROR
+	call sprint
+
+	hlt
+
+kernel_read_error:
+	/* print bootloader read error message */
+	mov si, offset MSG_KERNEL_ERROR
 	call sprint
 
 	hlt
