@@ -4,6 +4,7 @@ MEMORY {
 
 	boot1 : o = 0x7c00, l = 0x200
 	boot2 : o = 0x7000, l = 3K
+    kernel : o = 0x8000, l = 16K
 	
 }
 
@@ -17,5 +18,10 @@ SECTIONS {
 		boot2.o(.text)
 		pmode.o(.text)
 	} > boot2
+
+    . = 0xe00;
+    .kernel 0x8000 (NOLOAD): AT(0xe00) {
+        kboot.o(.bss .text)
+    } > kernel
 
 }
