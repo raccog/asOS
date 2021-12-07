@@ -13,8 +13,14 @@ _second_boot_entry:
 	jmp _boot2_code
 
 /* interrupt table descriptor register */
-#idtr:
-	#.word 8
+idtr:
+	.word idt_end - idt_start - 1   # size = 256 entries * 8 bytes each
+    .long idt_start                 # offset = address of IDT
+
+.align 8    # align IDT to 8 byte boundary
+idt_start:
+    .fill 256, 8, 0     # fill 256 entries with address 0x00000000
+idt_end:
 
 /* global table descriptor register */
 gdtr:
@@ -67,6 +73,9 @@ _boot2_code:
 	
 	/* load GDT */
 	lgdt [gdtr]
+
+    /* load IDT */
+    lidt [idtr]
 
 	/* enter protected mode */
 	mov eax, cr0
