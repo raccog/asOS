@@ -51,5 +51,5 @@ void Terminal::write(const uint8_t *data, size_t size) {
 }
 
 void Terminal::writeString(const char *str) {
-    write(str, strlen(str));
+    write(reinterpret_cast<const uint8_t *>(str), strlen(str));
 }

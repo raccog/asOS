@@ -26,7 +26,7 @@ enum class VgaColor {
 };
 
 static inline uint8_t VgaEntryColor(VgaColor fg, VgaColor bg) {
-    return fg | bg << 4;
+    return static_cast<uint8_t>(fg) | static_cast<uint8_t>(bg) << 4;
 }
 
 static inline uint16_t VgaEntry(unsigned char uc, uint8_t color) {
@@ -50,6 +50,6 @@ public:
     void setColor(uint8_t color);
     void putEntryAt(char c, uint8_t color, size_t x, size_t y);
     void putChar(char c);
-    void write(uint8_t *data, size_t size);
+    void write(const uint8_t *data, size_t size);
     void writeString(const char *data);
 };
