@@ -39,6 +39,18 @@ This document contains the memory map for each architecture.
 |										|
 |	Unused memory						|
 |										|
+|							0x00007fff	|
+-----------------------------------------
+|							0x00008000	|
+|										|
+|	Kernel      						|
+|										|
+|							0x00009fff	|
+-----------------------------------------
+|							0x0000a000	|
+|										|
+|	Unused memory						|
+|										|
 |							0x0007ffff	|
 -----------------------------------------
 |							0x0007ffff	|
