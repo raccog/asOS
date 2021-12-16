@@ -16,9 +16,8 @@ stack_top:
 _start:
     mov esp, offset stack_top
 
-    call forever
+    call kmain
 
     cli
     hlt
-forever:
-    jmp forever
+L1: jmp L1
