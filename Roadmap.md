@@ -2,7 +2,7 @@
 
 ## general (file structure, toolchain, etc.)
 
-- [ ] separate makefile into bootloader and kernel
+- [x] separate makefile into bootloader and kernel
 
 ## bootloader
 
