@@ -68,7 +68,7 @@ printreg16_loop:
 	inc edi			# move to next output character
 	loop printreg16_loop
 
-	mov esi, outstr16
+	mov esi, offset outstr16
 	call sprint		# print output buffer
 
 	ret
