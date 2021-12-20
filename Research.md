@@ -2,7 +2,6 @@
 
 This document is just to keep track of the topics I am currently researching. 
 
-* Build system
 * Paging
 * Interrupt service routines
 * Interrupt descriptor table

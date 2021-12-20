@@ -1,9 +1,5 @@
 # asOS Roadmap
 
-## general (file structure, toolchain, etc.)
-
-- [x] separate makefile into bootloader and kernel
-
 ## bootloader
 
 The bootloader does only two things:
@@ -25,7 +21,7 @@ The bootloader does only two things:
 - [x] enable a20 line
 - [x] load gdtr
 - [x] setup gdt
-- [ ] load idtr
+- [x] load idtr
 - [ ] setup idt
 - [x] switch to protected mode
 
@@ -41,7 +37,7 @@ The step after this will likely be implementing basic processes, but that could 
 ### major
 
 - [x] setup stack
-- [ ] kernel main in C
+- [x] kernel main in C
 - [ ] paging
 - [ ] command line
 - [ ] keyboard input
