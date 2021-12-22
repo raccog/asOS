@@ -1,3 +1,7 @@
+/*
+ *  Interface for writing text to VGA memory.
+ */
+
 #pragma once
 
 #include <stddef.h>

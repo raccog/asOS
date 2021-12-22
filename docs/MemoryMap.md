@@ -57,6 +57,24 @@ This document contains the memory map for each architecture.
 |                                       |
 |   Unused memory                       |
 |                                       |
+|                           0x00010010  |
+-----------------------------------------
+|                           0x00010100  |
+|                                       |
+|   Interrupt Descriptor Table          |
+|                                       |
+|                           0x000108ff  |
+-----------------------------------------
+|                           0x00010900  |
+|                                       |
+|   Global Descriptor Table             |
+|                                       |
+|                           0x000110ff  |
+-----------------------------------------
+|                           0x00011100  |
+|                                       |
+|   Reserved memory                     |
+|                                       |
 |                           0x0007ffff  |
 -----------------------------------------
 |                           0x0007ffff  |

@@ -1,20 +1,19 @@
 /*
- * Kernel bootstrap for always sunny OS (asOS)
+ *  Kernel i686 bootstrap procedure.
  */
 
 .intel_syntax noprefix
 
-.equ kstack, 0x10000
-
 .section .text
 .code32
+
 .global _start
 .type _start, @function
 _start:
-    mov esp, kstack
+    call kmain  # call kernel main function
 
-    call kmain
-
+    # kernel main function should never return,
+    # but if it does, halt and run an endless loop
     cli
     hlt
-L1: jmp L1
+1:  jmp 1b

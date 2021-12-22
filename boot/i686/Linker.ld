@@ -16,6 +16,8 @@ SECTIONS {
 	.boot2 0x7000 : AT(SIZEOF(.boot1))  {
 		**/i686/Boot2.S.o(.text)
 		**/i686/Pmode.S.o(.text)
+        **/i686/PrintReal.S.o(.text .data)
+        **/i686/Print.S.o(.text .data)
 	} > boot2
 
 }
