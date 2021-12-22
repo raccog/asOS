@@ -11,7 +11,7 @@
 .code16
 
 # Includes
-.include "arch/i686/Locations.inc.S"
+.include "ArchLib/i686/Locations.inc.s"
 
 # jump past data
 _boot_entry2:
@@ -20,7 +20,7 @@ _boot_entry2:
 
     # print init message
     mov esi, offset MSG_BOOT2
-    call sprint_real
+    call sprintln_real
 
     # enable a20 line
     call enable_a20
@@ -161,7 +161,7 @@ a20_check_loop2:
 
     # display error and halt, a20 line could not be enabled
     mov si, offset a20_MSG_ERROR
-    call sprint_real
+    call sprintln_real
 
     hlt
 

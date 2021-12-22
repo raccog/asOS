@@ -1,4 +1,4 @@
-#include "kernel/arch/i686/VGA.h"
+#include "Kernel/Arch/i686/VGA.h"
 
 size_t strlen(const char *str) {
     size_t len = 0;

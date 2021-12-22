@@ -11,7 +11,7 @@
 .code32
 
 # Includes
-.include "arch/i686/Locations.inc.S"
+.include "ArchLib/i686/Locations.inc.s"
 
 # string constants
 MSG_PMODE:  .asciz "Running second bootloader in protected mode."

@@ -2,5 +2,5 @@
 *.swp
 *.o
 
-build/
-toolchain/
+Build/
+Toolchain/

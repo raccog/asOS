@@ -22,7 +22,6 @@ The bootloader does only two things:
 - [x] load gdtr
 - [x] setup gdt
 - [x] load idtr
-- [ ] setup idt
 - [x] switch to protected mode
 
 ## kernel
@@ -38,6 +37,7 @@ The step after this will likely be implementing basic processes, but that could 
 
 - [x] setup stack
 - [x] kernel main in C
+- [ ] setup interrupt handlers
 - [ ] paging
 - [ ] command line
 - [ ] keyboard input
@@ -46,3 +46,9 @@ The step after this will likely be implementing basic processes, but that could 
 - [ ] query system features command
 - [ ] system dump over serial command
 - [ ] system dump over VGA command
+
+### minor
+
+- [ ] abstract terminal interface
+- [ ] implement serial output
+- [ ] move cursor when printing string

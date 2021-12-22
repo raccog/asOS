@@ -20,7 +20,7 @@ ypos:       .byte 0
 
 # global procedures
 .global cprint_real
-.global sprint_real
+.global sprintln_real
 
 # Prints an ascii character to the screen using BIOS.
 #
@@ -37,16 +37,16 @@ cprint_real:
 #
 # Inputs:
 #   ds:si = address of first character in the string
-sprint_real:
+sprintln_real:
     lodsb               # al = [ds:si]
     cmp al, 0
     je 1f               # if al == 0 return
     call cprint_real    # print character
-    jmp sprint_real     # restart loop
-1:
-    # print a new line
-    mov al, 13 
+    jmp sprintln_real   # restart loop
+
+    # Print new line
+1:  mov al, '\r'
     call cprint_real
-    mov al, 10
+    mov al, '\n'
     call cprint_real
     ret

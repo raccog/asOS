@@ -12,7 +12,7 @@
 .code16
 
 # Includes
-.include "arch/i686/Locations.inc.S"
+.include "ArchLib/i686/Locations.inc.s"
 
 .align 8
 _boot_entry1:
@@ -59,7 +59,7 @@ _boot_entry1:
 
     # print init message
     mov si, offset MSG_BOOT1
-    call sprint_real
+    call sprintln_real
 
     # load kernel
     mov bx, KERNEL
@@ -88,7 +88,7 @@ MSG_KERNEL_ERROR:   .asciz "Error while reading kernel from disk"
 kernel_read_error:
     # print bootloader read error message
     mov si, offset MSG_KERNEL_ERROR
-    call sprint_real
+    call sprintln_real
 
     hlt
 

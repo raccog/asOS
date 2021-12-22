@@ -17,7 +17,7 @@ SECTIONS {
 		**/i686/Boot2.S.o(.text)
 		**/i686/Pmode.S.o(.text)
         **/i686/PrintReal.S.o(.text .data)
-        **/i686/Print.S.o(.text .data)
+        **/ArchLib/i686-archlib.a(.text .rodata .data .bss)
 	} > boot2
 
 }

@@ -7,7 +7,7 @@
 
 .section .data
 # string constants
-hexstr:         .ascii "0123456789ABCDEF"
+hexstr:     .ascii "0123456789ABCDEF"
 
 # data
 outstr16:   .asciz "0x0000"
