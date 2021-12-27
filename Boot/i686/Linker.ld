@@ -1,23 +1,24 @@
 ENTRY(_boot_entry1)
 
 MEMORY {
-
 	boot1 : o = 0x7c00, l = 0x200
 	boot2 : o = 0x7000, l = 3K
-	
 }
 
 SECTIONS {
 
-	.boot1 0x7c00 : AT(0) {
-		**/i686/Boot.S.o(.text)
-	} > boot1
+	.boot1 ORIGIN(boot1) : AT(0) {
+		*/Build/Boot/i686/Boot.S.o(.text)
+        */Build/Boot/i686/PrintReal.S.o(.text .rodata .data)
 
-	.boot2 0x7000 : AT(SIZEOF(.boot1))  {
-		**/i686/Boot2.S.o(.text)
-		**/i686/Pmode.S.o(.text)
-        **/i686/PrintReal.S.o(.text .data)
-        **/ArchLib/i686-archlib.a(.text .rodata .data .bss)
+        . = 510;
+        SHORT(0xaa55)
+	} > boot1 =0x0000
+
+	.boot2 ORIGIN(boot2) : AT(LENGTH(boot1)) {
+		*/Build/Boot/i686/Boot2.S.o(.text)
+		*/Build/Boot/i686/Pmode.S.o(.text)
+        */Build/ArchLib/i686-archlib.a(.text .rodata .data)
 	} > boot2
 
 }

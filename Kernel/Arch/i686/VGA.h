@@ -38,9 +38,6 @@ static inline uint16_t VgaEntry(unsigned char uc, uint8_t color) {
 
 }
 
-// strlen will be moved to a new file
-size_t strlen(const char *str);
-
 class Terminal {
     size_t row, col;
     uint8_t color;

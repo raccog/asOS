@@ -4,7 +4,7 @@
 
 .intel_syntax noprefix
 
-.section .text
+.section .kboot
 .code32
 
 .global _start

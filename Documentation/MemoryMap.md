@@ -4,6 +4,7 @@ This document contains the memory map for each architecture.
 
 ## i686
 
+```
 -----------------------------------------
 |                           0x00000000  |
 |                                       |
@@ -89,4 +90,4 @@ This document contains the memory map for each architecture.
 |                                       |
 |                           0x????????  |
 -----------------------------------------
-
+```

@@ -1,29 +1,27 @@
 MEMORY {
-
 	ram : o = 0x8000, l = 16K
-	
 }
 
 SECTIONS {
 
     .kboot : {
-        **/i686/Kboot.S.o(.text)
-    } > ram
+        */Build/Kernel/Arch/i686/Kboot.S.o(.kboot)
+    } >ram
 
-    .text BLOCK(1K) : {
+    .text : {
         *(.text)
-    } > ram
+    } >ram
 
     .rodata : {
         *(.rodata)
-    } > ram
+    } >ram
 
     .data : {
         *(.data)
-    } > ram
+    } >ram
 
     .bss : {
         *(.bss)
-    } > ram
+    } >ram
 
 }

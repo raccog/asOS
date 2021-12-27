@@ -1,12 +1,6 @@
 #include "Kernel/Arch/i686/VGA.h"
 
-size_t strlen(const char *str) {
-    size_t len = 0;
-    while (str[len]) {
-        ++len;
-    }
-    return len;
-}
+#include "StdLib/StdLib.h"
 
 Terminal::Terminal() {
     init();

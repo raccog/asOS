@@ -12,6 +12,9 @@ ARCHLIB_i686_BUILD_DIR := $(ARCHLIB_BUILD_DIR)/i686
 KERNEL_DIR := $(SRC_DIR)/Kernel
 KERNEL_BUILD_DIR := $(BUILD_DIR)/Kernel
 
+STDLIB_DIR := $(SRC_DIR)/StdLib
+STDLIB_BUILD_DIR := $(BUILD_DIR)/StdLib
+
 BOOT_DIR := $(SRC_DIR)/Boot
 BOOT_BUILD_DIR := $(BUILD_DIR)/Boot
 BOOT_i686_DIR := $(BOOT_DIR)/i686
@@ -22,6 +25,7 @@ KERNEL_i686_BUILD_DIR := $(KERNEL_BUILD_DIR)/Arch/i686
 
 # Executable paths
 i686_AS := $(TOOLCHAIN_BIN_DIR)/i686-elf-as
+i686_AR := $(TOOLCHAIN_BIN_DIR)/i686-elf-ar
 i686_CC := $(TOOLCHAIN_BIN_DIR)/i686-elf-gcc
 i686_CXX := $(TOOLCHAIN_BIN_DIR)/i686-elf-g++
 i686_LD := $(TOOLCHAIN_BIN_DIR)/i686-elf-ld
@@ -52,6 +56,11 @@ BOOT_i686_LINKER_SCRIPT := $(BOOT_i686_DIR)/Linker.ld
 BOOT_i686_ASM := $(wildcard $(BOOT_i686_DIR)/*.S)
 BOOT_i686_ASM_SRC := $(notdir $(BOOT_i686_ASM))
 BOOT_i686_ASM_OBJ := $(patsubst %.S,$(BOOT_i686_BUILD_DIR)/%.S.o,$(BOOT_i686_ASM_SRC))
+
+# StdLib files
+STDLIB_CXX := $(wildcard $(STDLIB_DIR)/*.cpp)
+STDLIB_CXX_SRC := $(notdir $(STDLIB_CXX))
+STDLIB_CXX_OBJ := $(patsubst %.cpp,$(STDLIB_BUILD_DIR)/%.cpp.o,$(STDLIB_CXX_SRC))
 
 #
 # Main rules
@@ -95,6 +104,9 @@ $(ARCHLIB_i686_BUILD_DIR): $(ARCHLIB_BUILD_DIR)
 $(BOOT_BUILD_DIR): $(BUILD_DIR)
 	@mkdir -p $@
 
+$(STDLIB_BUILD_DIR): $(BUILD_DIR)
+	@mkdir -p $@
+
 $(BOOT_i686_BUILD_DIR): $(BOOT_BUILD_DIR)
 	@mkdir -p $@
 
@@ -113,7 +125,7 @@ archlib-all: i686-archlib-all
 i686-archlib-all: $(ARCHLIB_i686_BUILD_DIR) $(ARCHLIB_BUILD_DIR)/i686-archlib.a
 
 $(ARCHLIB_BUILD_DIR)/i686-archlib.a: $(ARCHLIB_i686_ASM_OBJ)
-	$(i686_LD) -T $(ARCHLIB_i686_LINKER_SCRIPT) -o $@ $^
+	$(i686_AR) rcs $@ $^
 
 $(ARCHLIB_i686_BUILD_DIR)/%.S.o: $(ARCHLIB_i686_DIR)/%.S
 	$(i686_AS) -o $@ $^
@@ -136,13 +148,25 @@ $(BOOT_i686_BUILD_DIR)/%.S.o: $(BOOT_i686_DIR)/%.S
 # Kernel rules
 #
 
-kernel-all: archlib-all $(KERNEL_BUILD_DIR) $(KERNEL_i686_BUILD_DIR) $(KERNEL_BUILD_DIR)/asos-kernel
+kernel-all: archlib-all stdlib-all $(KERNEL_BUILD_DIR) $(KERNEL_i686_BUILD_DIR) $(KERNEL_BUILD_DIR)/asos-kernel
 
-$(KERNEL_BUILD_DIR)/asos-kernel: $(ARCHLIB_BUILD_DIR)/i686-archlib.a $(KERNEL_i686_CXX_OBJ) $(KERNEL_i686_ASM_OBJ)
+$(KERNEL_BUILD_DIR)/asos-kernel: $(KERNEL_i686_CXX_OBJ) $(KERNEL_i686_ASM_OBJ) $(ARCHLIB_BUILD_DIR)/i686-archlib.a $(STDLIB_BUILD_DIR)/stdlib.a
 	$(i686_LD) --oformat binary -T $(KERNEL_i686_LINKER_SCRIPT) -o $@ $^
 
 $(KERNEL_i686_BUILD_DIR)/%.S.o: $(KERNEL_i686_DIR)/%.S
 	$(i686_AS) -o $@ $^
 
 $(KERNEL_i686_BUILD_DIR)/%.cpp.o: $(KERNEL_i686_DIR)/%.cpp
+	$(i686_CXX) -o $@ -c $< $(CXX_FLAGS)
+
+#
+# StdLib rules
+#
+
+stdlib-all: $(STDLIB_BUILD_DIR) $(STDLIB_BUILD_DIR)/stdlib.a
+
+$(STDLIB_BUILD_DIR)/stdlib.a: $(STDLIB_CXX_OBJ)
+	$(i686_AR) rcs $@ $^
+
+$(STDLIB_BUILD_DIR)/%.cpp.o: $(STDLIB_DIR)/%.cpp
 	$(i686_CXX) -o $@ -c $< $(CXX_FLAGS)

@@ -5,10 +5,12 @@
 
 .intel_syntax noprefix
 
-.section .data
+.section .rodata
 
 # string constants
 hexstr:         .ascii "0123456789ABCDEF"
+
+.section .data
 
 # data
 outstr16:   .asciz "0x0000"

@@ -91,7 +91,3 @@ kernel_read_error:
     call sprintln_real
 
     hlt
-
-# fill with zeros until MBR signature
-.fill 510 - (. - _boot_entry1), 1, 0
-.word 0xaa55    # MBR signature
