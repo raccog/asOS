@@ -15,5 +15,7 @@ extern "C" void kmain(void) {
 
     int i = 10 / 0;
 
+    term.writeString("Set IDT.");
+
     while (true) {}
 }
