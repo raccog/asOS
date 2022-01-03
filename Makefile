@@ -3,6 +3,8 @@ SRC_DIR := $(PWD)
 BUILD_DIR := $(SRC_DIR)/Build
 TOOLCHAIN_DIR := $(SRC_DIR)/Toolchain
 TOOLCHAIN_BIN_DIR := $(TOOLCHAIN_DIR)/bin
+PREFIX=$(TOOLCHAIN_DIR)
+export PREFIX
 
 ARCHLIB_DIR := $(SRC_DIR)/ArchLib
 ARCHLIB_BUILD_DIR := $(BUILD_DIR)/ArchLib
@@ -73,6 +75,19 @@ run: asos-i686
 
 clean: 
 	rm -rf $(BUILD_DIR)
+
+#
+# Toolchain rules
+#
+
+toolchain-gnu:
+	cd Scripts/MakeToolchain/gnu && $(MAKE) 
+
+toolchain-llvm:
+	cd Scripts/MakeToolchain/llvm && $(MAKE) 
+
+clean-toolchain:
+	rm -rf Toolchain
 
 .EXPORT_ALL_VARIABLES:
 
