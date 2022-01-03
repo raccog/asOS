@@ -139,7 +139,7 @@ $(SRC_PATH)/$(GMP_TAR): $(SRC_PATH)
 
 mpfr: $(SRC_PATH)/$(MPFR)
 
-$(SRC_PATH)/$(MPFR): $(SRC_PATH)/$(MPFR_TAR)
+$(SRC_PATH)/$(MPFR): $(SRC_PATH)/$(MPFR_TAR) gmp
 	@echo "Unpacking mpfr"
 	$(TAR) xf $< -C $(SRC_PATH)
 	@echo "Building mpfr"
@@ -154,7 +154,7 @@ $(SRC_PATH)/$(MPFR_TAR): $(SRC_PATH)
 
 mpc: $(SRC_PATH)/$(MPC)
 
-$(SRC_PATH)/$(MPC): $(SRC_PATH)/$(MPC_TAR)
+$(SRC_PATH)/$(MPC): $(SRC_PATH)/$(MPC_TAR) gmp mpfr
 	@echo "Unpacking mpc"
 	$(TAR) xf $< -C $(SRC_PATH)
 	@echo "Building mpc"
