@@ -6,8 +6,8 @@ TAR := tar
 TARGET ?= i686-elf
 
 # Host system
-HOST_OS := $(shell uname)
-HOST_MACH := $(shell uname -m)
+HOST_OS ?= $(shell uname)
+HOST_MACH ?= $(shell uname -m)
 ifeq ($(HOST_OS),Darwin)
 ifeq ($(HOST_MACH),arm64)
 	MACOS_ARM := true
@@ -66,45 +66,58 @@ else
 dependencies:
 endif
 
+.PHONY: all dependencies gcc binutils gmp mpc mpfr gcc-deps
+
 #
 # Directories
 #
 
-$(SRC_PATH):
+$(PREFIX):
+	@mkdir -p $@
+
+$(SRC_PATH): $(PREFIX)
 	@mkdir -p $@
 
 #
 # Binutils and GCC
 #
 
-binutils: $(SRC_PATH)/$(BINUTILS)
-
-$(SRC_PATH)/$(BINUTILS): $(SRC_PATH)/$(BINUTILS_TAR) dependencies
-	@echo "Unpacking binutils"
-	$(TAR) xf $< -C $(SRC_PATH)
-	@echo "Building binutils"
-	cd $@ && mkdir build && cd build && ../configure $(BINUTILS_FLAGS)
-	$(MAKE) -C $@/build $(MAKE_FLAGS)
+binutils: $(SRC_PATH)/$(BINUTILS)/build/binutils
 	@echo "Installing binutils"
-	$(MAKE) -C $@/build install
+	$(MAKE) -C $(SRC_PATH)/$(BINUTILS)/build install
 
-$(SRC_PATH)/$(BINUTILS_TAR): $(SRC_PATH)
+$(SRC_PATH)/$(BINUTILS_TAR): $(SRC_PATH) dependencies
 	@echo "Downloading binutils"
 	$(CURL) $(BINUTILS_URL) -o $@
+
+$(SRC_PATH)/$(BINUTILS): $(SRC_PATH)/$(BINUTILS_TAR)
+	@echo "Unpacking binutils"
+	$(TAR) xf $< -C $(SRC_PATH)
+
+$(SRC_PATH)/$(BINUTILS)/build: $(SRC_PATH)/$(BINUTILS)
+	@mkdir $@
+
+$(SRC_PATH)/$(BINUTILS)/build/Makefile: $(SRC_PATH)/$(BINUTILS)/build
+	@echo "Configuring binutils"
+	cd $< && ../configure $(BINUTILS_FLAGS)
+
+$(SRC_PATH)/$(BINUTILS)/build/binutils: $(SRC_PATH)/$(BINUTILS)/build/Makefile
+	@echo "Building binutils"
+	$(MAKE) -C $(SRC_PATH)/$(BINUTILS)/build $(MAKE_FLAGS)
 
 gcc: $(GCC_PATH)
 
 ifdef MACOS_ARM
-gcc_deps: binutils dependencies
+gcc-deps: binutils dependencies
 	@echo "Downloading gcc"
 	git clone https://github.com/iains/gcc-darwin-arm64.git $(GCC_PATH)
 else
-gcc_deps: $(SRC_PATH)/$(GCC_TAR) binutils dependencies
+gcc-deps: $(SRC_PATH)/$(GCC_TAR) binutils dependencies
 	@echo "Unpacking gcc"
 	$(TAR) xf $< -C $(SRC_PATH)
 endif
 
-$(GCC_PATH): gcc_deps
+$(GCC_PATH): gcc-deps
 	@echo "Building gcc"
 	cd $@ && mkdir build && cd build && ../configure $(GCC_FLAGS)
 	$(MAKE) -C $@/build $(MAKE_FLAGS) all-gcc
