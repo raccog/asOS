@@ -1,11 +1,24 @@
 #!/bin/bash
 
+# Toolchain versions
+LLVM="llvm-project-13.0.0"
+
+# Paths
+SRC_DIR="$PREFIX/src"
+TARBALL_DIR="$PREFIX/tarballs"
+LLVM_DIR="$SRC_DIR/llvm-project"
+
+# Tarballs
+LLVM_TAR="$LLVM.tar.xz"
+
 # Flags
-LLVM_FLAGS="-G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX='$PREFIX' -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;libcxx;libcxxabi'"
+LLVM_FLAGS="-DCMAKE_INSTALL_PREFIX='$PREFIX' -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;libcxx;libcxxabi'"
+
+# URLs
+LLVM_URL="https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0/$LLVM.src.tar.xz"
 
 # Extras
 PCOUNT=`nproc`
-LLVM_BRANCH="release/13.x"
 
 # Ensure toolchain dir is set
 if [[ -z $PREFIX ]]; then
@@ -13,26 +26,32 @@ if [[ -z $PREFIX ]]; then
 	exit 1
 fi
 
-# Move to toolchain dir
+# Create directories that do not exist
 if [[ ! -d $PREFIX ]]; then
 	mkdir $PREFIX
 fi
-cd $PREFIX
 
-# Move to src dir
-if [[ ! -d src ]]; then
-	mkdir src
+if [[ ! -d $SRC_DIR ]]; then
+	mkdir $SRC_DIR
 fi
-cd src
+
+if [[ ! -d $TARBALL_DIR ]]; then
+	mkdir $TARBALL_DIR
+fi
 
 # Download llvm toolchain
-echo "Downloading llvm project from github."
-git clone "https://github.com/llvm/llvm-project.git"
+echo "Downloading llvm-project from github."
+#git clone "https://github.com/llvm/llvm-project.git" $LLVM_DIR
+curl -L "$LLVM_URL" -o "$TARBALL_DIR/$LLVM_TAR"
 
-# Build llvm toolchain
-echo "Building llvm project branch $LLVM_BRANCH."
-cd llvm-project
-git switch $LLVM_BRANCH
+echo "Extracting llvm-project"
+tar xf "$TARBALL_DIR/$LLVM_TAR" -C "$SRC_DIR"
+exit 1
+
+# Build and install llvm toolchain
+echo "Building llvm-project."
+cd $LLVM_DIR
 cmake -S llvm -B build $LLVM_FLAGS
 cmake --build build -j$PCOUNT
+echo "Installing llvm toolchain"
 cmake --install build

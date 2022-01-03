@@ -81,7 +81,7 @@ clean:
 #
 
 toolchain-gnu:
-	cd Scripts/MakeToolchain/gnu && $(MAKE) binutils
+	cd Scripts/MakeToolchain/gnu && $(MAKE)
 
 toolchain-llvm:
 	cd Scripts/MakeToolchain/llvm && $(MAKE) 
