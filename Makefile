@@ -12,7 +12,7 @@ BUILD_DIR := build
 
 MKCWD = mkdir -p $(@D)
 
-include boot/.build.mk
+include boot/arch/x86_64/.build.mk
 
 .PHONY: all
 all: $(ALL)
