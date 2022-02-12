@@ -9,6 +9,7 @@ LD := clang
 CFLAGS := -O2
 
 BUILD_DIR := build
+CACHE_DIR := $(BUILD_DIR)/cache
 
 MKCWD = mkdir -p $(@D)
 
