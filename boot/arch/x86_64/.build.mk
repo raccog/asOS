@@ -5,7 +5,7 @@ BOOT_x86_64_OBJ = $(patsubst $(BOOT_x86_64_DIR)/%, $(BOOT_x86_64_BUILD_DIR)/%.o,
 
 BOOT_x86_64_CC = clang
 BOOT_x86_64_LD = lld-link
-BOOT_x86_64_CFLAGS = -target x86_64-pc-unknown-windows -ffreestanding -mno-red-zone -std=c11 -Icommon/arch/x86_64
+BOOT_x86_64_CFLAGS = -target x86_64-pc-unknown-windows -ffreestanding -mno-red-zone -std=c11 -Ilibs
 BOOT_x86_64_LDFLAGS = -flavor link -subsystem:efi_application -entry:efi_main
 
 BOOTLOADER_x86_64 = $(BOOT_x86_64_BUILD_DIR)/boot.efi

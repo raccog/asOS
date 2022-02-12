@@ -32,6 +32,8 @@ typedef uint8_t EfiBool;
 typedef uint16_t EfiChar16;
 typedef uint64_t EfiPhysicalAddr;
 typedef void *EfiHandle;
+typedef uint64_t EfiPhysicalAddress;
+typedef uint64_t EfiVirtualAddress;
 
 typedef struct {
     uint64_t signature;
@@ -75,8 +77,66 @@ typedef struct _EfiSimpleTextOutput {
     EfiSimpleTextOutputMode *mode;
 } EfiSimpleTextOutput;
 
+typedef struct _EfiMemoryDescriptor {
+    uint32_t type;
+    EfiPhysicalAddress physical_start;
+    EfiVirtualAddress virtual_start;
+    uint64_t num_pages;
+    uint64_t attribute;
+} EfiMemoryDescriptor;
+
+typedef EfiStatus (*EfiGetMemoryMap)(uint64_t *memory_map_size, struct _EfiMemoryDescriptor *memory_map, uint64_t *map_key, uint64_t *descriptor_size, uint32_t *descriptor_version);
+
 typedef struct {
-	EfiTableHeader hdr;
+    EfiTableHeader header;
+    void *raise_tpl;
+    void *restore_tpl;
+    void *allocate_pages;
+    void *free_pages;
+    EfiGetMemoryMap get_memory_map;
+    void *allocate_pool;
+    void *free_pool;
+    void *create_event;
+    void *set_timer;
+    void *wait_for_event;
+    void *signal_event;
+    void *close_event;
+    void *check_event;
+    void *install_protocol_interface;
+    void *reinstall_protocol_interface;
+    void *uninstall_protocol_interface;
+    void *handle_protocol;
+    void *_reserved;
+    void *register_protocol_notify;
+    void *locate_handle;
+    void *locate_device_path;
+    void *install_configuration_table;
+    void *load_image;
+    void *start_image;
+    void *exit;
+    void *unload_image;
+    void *exit_boot_services;
+    void *get_next_monotonic_count;
+    void *stall;
+    void *set_watchdog_timer;
+    void *connect_controller;
+    void *disconnect_controller;
+    void *open_protocol;
+    void *close_protocol;
+    void *open_protocol_information;
+    void *protocols_per_handle;
+    void *locate_handle_buffer;
+    void *locate_protocol;
+    void *install_multiple_protocol_interfaces;
+    void *uninstall_multiple_protocol_interfaces;
+    void *calculate_crc32;
+    void *copy_mem;
+    void *set_mem;
+    void *create_event_ex;
+} EfiBootServices;
+
+typedef struct {
+	EfiTableHeader header;
 	EfiChar16 *firmware_vendor;
 	uint32_t firmware_revision;
 	EfiHandle console_in_handle;
@@ -85,8 +145,8 @@ typedef struct {
 	EfiSimpleTextOutput *console_out;
 	EfiHandle std_error_handle;
 	EfiSimpleTextOutput *std_error;
-	uint64_t runtime;   // runtime services pointer
-	uint64_t boottime;  // boottime services pointer
+	uint64_t runtime_services;   // runtime services pointer
+	EfiBootServices *boot_services;
 	uint32_t num_table_entries;
 	uint64_t config_table;  // config table pointer
 } EfiSystemTable;
