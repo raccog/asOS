@@ -35,6 +35,32 @@ typedef void *EfiHandle;
 typedef uint64_t EfiPhysicalAddress;
 typedef uint64_t EfiVirtualAddress;
 
+typedef enum {
+    AllocateAnyPages,
+    AllocateMaxAddress,
+    AllocateAddress,
+    MaxAllocateType
+} EfiAllocateType;
+
+typedef enum {
+    EfiReservedMemoryType,
+    EfiLoaderCode,
+    EfiLoaderData,
+    EfiBootServicesCode,
+    EfiBootServicesData,
+    EfiRuntimeServicesCode,
+    EfiRuntimeServicesData,
+    EfiConventionalMemory,
+    EfiUnusableMemory,
+    EfiACPIReclaimMemory,
+    EfiACPIMemoryNVS,
+    EfiMemoryMappedIO,
+    EfiMemoryMappedIOPortSpace,
+    EfiPalCode,
+    EfiPersistentMemory,
+    EfiMaxMemoryType
+} EfiMemoryType;
+
 typedef struct {
     uint64_t signature;
     uint32_t revision;
@@ -85,14 +111,16 @@ typedef struct _EfiMemoryDescriptor {
     uint64_t attribute;
 } EfiMemoryDescriptor;
 
+typedef EfiStatus (*EfiAllocatePages)(EfiAllocateType type, EfiMemoryType memory_type, uint64_t pages, EfiPhysicalAddress *memory);
+typedef EfiStatus (*EfiFreePages)(EfiPhysicalAddress memory, uint64_t pages);
 typedef EfiStatus (*EfiGetMemoryMap)(uint64_t *memory_map_size, struct _EfiMemoryDescriptor *memory_map, uint64_t *map_key, uint64_t *descriptor_size, uint32_t *descriptor_version);
 
 typedef struct {
     EfiTableHeader header;
     void *raise_tpl;
     void *restore_tpl;
-    void *allocate_pages;
-    void *free_pages;
+    EfiAllocatePages allocate_pages;
+    EfiFreePages free_pages;
     EfiGetMemoryMap get_memory_map;
     void *allocate_pool;
     void *free_pool;
@@ -150,5 +178,13 @@ typedef struct {
 	uint32_t num_table_entries;
 	uint64_t config_table;  // config table pointer
 } EfiSystemTable;
+
+void efi_init(EfiSystemTable *st);
+
+EfiStatus efi_alloc(EfiPhysicalAddress *buf);
+
+EfiStatus efi_free(EfiPhysicalAddress buf);
+
+EfiStatus efi_print_str16(EfiChar16 *str);
 
 #endif
