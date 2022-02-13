@@ -1,5 +1,6 @@
 #include <std/alloc.h>
 
+// memory for global allocator
 Allocator _allocator;
 
 Allocator alloc() {

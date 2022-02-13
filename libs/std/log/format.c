@@ -1,17 +1,26 @@
-#include <stdarg.h>
-
 #include <std/alloc.h>
+#include <std/arg.h>
+#include <std/int.h>
 #include <std/io.h>
 #include <std/log.h>
 
-EfiStatus _status;
+// properties of a format string
+typedef struct {
+    bool left_justify;
+    bool force_positive_sign;
+    bool positive_space;
+    bool pound;
+    bool left_pad_zero;
 
-#define STATUS(s) \
-    _status = s; \
-    if (_status != EFI_SUCCESS) { \
-        return _status; \
-    }
+    size_t width;
+    size_t precision;
 
+    bool is_short;
+    bool is_long;
+    bool is_long_double;
+} FormatDescriptor;
+
+// pads scanner with n characters
 void pad_scanner(Scanner *scanner, char c, size_t n) {
     while (n > 0) {
         scanner_put_char(scanner, c);
@@ -19,10 +28,12 @@ void pad_scanner(Scanner *scanner, char c, size_t n) {
     }
 }
 
+// converts an integer's digits into characters and places them into a scanner's output buffer
 void print_integer(Scanner *scanner, FormatDescriptor *descriptor, int value) {
     int divisor = 1;
     size_t digit_count = 0;
 
+    // place sign or space if needed
     if (value < 0) {
         scanner_put_char(scanner, '-');
         value *= -1;
@@ -32,30 +43,36 @@ void print_integer(Scanner *scanner, FormatDescriptor *descriptor, int value) {
         scanner_put_char(scanner, ' ');
     }
 
+    // count the number of digits and get the maximum divisor that is a power of 10
     do {
         divisor *= 10;
         ++digit_count;
     } while (value / divisor > 0);
-
     divisor /= 10;
 
+    // pad the buffer with spaces and/or zeros if needed
     if (!descriptor->left_justify) {
         if (descriptor->width > 0) {
             if (descriptor->left_pad_zero && descriptor->precision == 0) {
+                // width > 0 AND pad zeros AND precision == 0
                 pad_scanner(scanner, '0', descriptor->width - digit_count);
             } else if (descriptor->width > descriptor->precision) {
                 if (descriptor->precision > digit_count) {
+                    // width > 0 AND width > precision AND precision > digit count
                     pad_scanner(scanner, ' ', descriptor->width - descriptor->precision);
                     pad_scanner(scanner, '0', descriptor->precision - digit_count);
                 } else {
+                    // width > 0 AND width > precision AND precision <= digit count
                     pad_scanner(scanner, ' ', descriptor->width - digit_count);
                 }
             }
         } else if (descriptor->precision > 0 && descriptor->precision > digit_count) {
+            // width == 0 AND precision > 0 AND precision > digit_count
             pad_scanner(scanner, '0', descriptor->precision - digit_count);
         }
     }
     
+    // place digits in buffer
     for (size_t i = 0; i < digit_count; ++i) {
         scanner_put_char(scanner, '9' - (char)(9 - value / divisor));
         value = value % divisor;
@@ -63,6 +80,7 @@ void print_integer(Scanner *scanner, FormatDescriptor *descriptor, int value) {
     }
 }
 
+// check for a percent sign
 bool parse_percent(Scanner *scanner) {
     char c = scanner_current_char(scanner);
 
@@ -74,6 +92,7 @@ bool parse_percent(Scanner *scanner) {
     return false;
 }
 
+// check for formatting flags
 bool parse_flags(Scanner *scanner, FormatDescriptor *descriptor) {
     char c;
 
@@ -122,6 +141,7 @@ bool parse_flags(Scanner *scanner, FormatDescriptor *descriptor) {
     return false;
 }
 
+// check for padding width
 bool parse_width(Scanner *scanner, FormatDescriptor *descriptor, va_list args) {
     char c;
 
@@ -157,6 +177,7 @@ bool parse_width(Scanner *scanner, FormatDescriptor *descriptor, va_list args) {
     return false;
 }
 
+// check for digit precision
 bool parse_precision(Scanner *scanner, FormatDescriptor *descriptor, va_list args) {
     char c = scanner_current_char(scanner);
 
@@ -197,6 +218,7 @@ bool parse_precision(Scanner *scanner, FormatDescriptor *descriptor, va_list arg
     return false;
 }
 
+// check length
 void parse_length(Scanner *scanner, FormatDescriptor *descriptor) {
     char c = scanner_current_char(scanner);
 
@@ -217,6 +239,7 @@ void parse_length(Scanner *scanner, FormatDescriptor *descriptor) {
     ++(scanner->in_idx);
 }
 
+// check type
 bool parse_type(Scanner *scanner, FormatDescriptor *descriptor, va_list args) {
     char c = scanner_current_char(scanner);
 
@@ -232,10 +255,12 @@ bool parse_type(Scanner *scanner, FormatDescriptor *descriptor, va_list args) {
     return true;
 }
 
+// format args into a scanner's buffer
 bool format_str(Scanner *scanner, va_list args) {
     FormatDescriptor descriptor;
     char c;
 
+    // init format descriptor
     descriptor.left_justify = false;
     descriptor.force_positive_sign = false;
     descriptor.positive_space = false;
@@ -246,6 +271,8 @@ bool format_str(Scanner *scanner, va_list args) {
     descriptor.is_short = false;
     descriptor.is_long = false;
     descriptor.is_long_double = false;
+
+    // parse each part of the format string
 
     if (parse_percent(scanner)) {
         return true;
@@ -272,37 +299,44 @@ bool format_str(Scanner *scanner, va_list args) {
     return true;
 }
 
-EfiStatus log(const char *fmt, ...) {
+void log(const char *fmt, ...) {
     va_list args;
     Scanner scanner, scanner_backup;
     char c;
 
+    // init scanners and args
     scanner_init(&scanner);
     scanner_init(&scanner_backup);
     va_start(args, fmt);
     scanner.in_buf = fmt;
-    alloc().alloc((uint8_t **)&scanner.out_buf, 0);
 
+    // allocate char buffer
+    alloc().alloc((u8 **)&scanner.out_buf, 0);
+
+    // loop through all characters in string
     while ((c = scanner_next_char(&scanner)) != '\0') {
+        // parse format string and place argument
         if (c == '%') {
             scanner_copy(&scanner, &scanner_backup);
             if (!format_str(&scanner, args)) {
+                // restore scanner from backup if formatting failed
                 scanner_copy(&scanner_backup, &scanner);
                 scanner_put_char(&scanner, '%');
             }
         } else {
+            // place normal character
             scanner_put_char(&scanner, c);
         }
     }
 
+    // go to next line and place null terminator
     scanner_put_char(&scanner, '\r');
     scanner_put_char(&scanner, '\n');
     scanner_put_char(&scanner, '\0');
 
+    // output string and free buffer
     printer().output_string(scanner.out_buf);
-    alloc().free((uint8_t *)scanner.out_buf);
+    alloc().free((u8 *)scanner.out_buf);
 
     va_end(args);
-
-    return EFI_SUCCESS;
 }

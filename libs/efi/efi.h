@@ -8,8 +8,8 @@
 #ifndef EFI_H
 #define EFI_H
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <std/bool.h>
+#include <std/int.h>
 
 #define EFI_SUCCESS             0
 #define EFI_ERROR               (1ull << 63)
@@ -27,13 +27,13 @@
 #define EFI_ABORTED             (21 | EFI_ERROR)
 #define EFI_SECURITY_VIOLATION  (26 | EFI_ERROR)
 
-typedef uint64_t EfiStatus;
-typedef uint8_t EfiBool;
-typedef uint16_t EfiChar16;
-typedef uint64_t EfiPhysicalAddr;
+typedef u64 EfiStatus;
+typedef u8 EfiBool;
+typedef u16 EfiChar16;
+typedef u64 EfiPhysicalAddr;
 typedef void *EfiHandle;
-typedef uint64_t EfiPhysicalAddress;
-typedef uint64_t EfiVirtualAddress;
+typedef u64 EfiPhysicalAddress;
+typedef u64 EfiVirtualAddress;
 
 typedef enum {
     AllocateAnyPages,
@@ -62,11 +62,11 @@ typedef enum {
 } EfiMemoryType;
 
 typedef struct {
-    uint64_t signature;
-    uint32_t revision;
-    uint32_t header_size;
-    uint32_t crc32;
-    uint32_t _reserved;
+    u64 signature;
+    u32 revision;
+    u32 header_size;
+    u32 crc32;
+    u32 _reserved;
 } EfiTableHeader;
 
 struct _EfiSimpleTextOutput;
@@ -74,19 +74,19 @@ struct _EfiSimpleTextOutput;
 typedef EfiStatus (*EfiTextReset)(struct _EfiSimpleTextOutput *self, bool extended_verification);
 typedef EfiStatus (*EfiTextString)(struct _EfiSimpleTextOutput *self, EfiChar16 *string);
 typedef EfiStatus (*EfiTextTestString)(struct _EfiSimpleTextOutput *self, EfiChar16 *string);
-typedef EfiStatus (*EfiTextQueryMode)(struct _EfiSimpleTextOutput *self, uint32_t mode_number, uint32_t *columns, uint32_t *rows);
-typedef EfiStatus (*EfiTextSetMode)(struct _EfiSimpleTextOutput *self, uint32_t mode_number);
-typedef EfiStatus (*EfiTextSetAttribute)(struct _EfiSimpleTextOutput *self, uint32_t attribute);
+typedef EfiStatus (*EfiTextQueryMode)(struct _EfiSimpleTextOutput *self, u32 mode_number, u32 *columns, u32 *rows);
+typedef EfiStatus (*EfiTextSetMode)(struct _EfiSimpleTextOutput *self, u32 mode_number);
+typedef EfiStatus (*EfiTextSetAttribute)(struct _EfiSimpleTextOutput *self, u32 attribute);
 typedef EfiStatus (*EfiTextClearScreen)(struct _EfiSimpleTextOutput *self);
-typedef EfiStatus (*EfiTextSetCursorPosition)(struct _EfiSimpleTextOutput *self, uint32_t column, uint32_t row);
+typedef EfiStatus (*EfiTextSetCursorPosition)(struct _EfiSimpleTextOutput *self, u32 column, u32 row);
 typedef EfiStatus (*EfiTextEnableCursor)(struct _EfiSimpleTextOutput *self, bool visible);
 
 typedef struct {
-    int32_t max_mode;
-    int32_t mode;
-    int32_t attribute;
-    int32_t cursor_column;
-    int32_t cursor_row;
+    i32 max_mode;
+    i32 mode;
+    i32 attribute;
+    i32 cursor_column;
+    i32 cursor_row;
     bool cursor_visible;
 } EfiSimpleTextOutputMode;
 
@@ -104,16 +104,16 @@ typedef struct _EfiSimpleTextOutput {
 } EfiSimpleTextOutput;
 
 typedef struct _EfiMemoryDescriptor {
-    uint32_t type;
+    u32 type;
     EfiPhysicalAddress physical_start;
     EfiVirtualAddress virtual_start;
-    uint64_t num_pages;
-    uint64_t attribute;
+    u64 num_pages;
+    u64 attribute;
 } EfiMemoryDescriptor;
 
-typedef EfiStatus (*EfiAllocatePages)(EfiAllocateType type, EfiMemoryType memory_type, uint64_t pages, EfiPhysicalAddress *memory);
-typedef EfiStatus (*EfiFreePages)(EfiPhysicalAddress memory, uint64_t pages);
-typedef EfiStatus (*EfiGetMemoryMap)(uint64_t *memory_map_size, struct _EfiMemoryDescriptor *memory_map, uint64_t *map_key, uint64_t *descriptor_size, uint32_t *descriptor_version);
+typedef EfiStatus (*EfiAllocatePages)(EfiAllocateType type, EfiMemoryType memory_type, u64 pages, EfiPhysicalAddress *memory);
+typedef EfiStatus (*EfiFreePages)(EfiPhysicalAddress memory, u64 pages);
+typedef EfiStatus (*EfiGetMemoryMap)(u64 *memory_map_size, struct _EfiMemoryDescriptor *memory_map, u64 *map_key, u64 *descriptor_size, u32 *descriptor_version);
 
 typedef struct {
     EfiTableHeader header;
@@ -166,25 +166,29 @@ typedef struct {
 typedef struct {
 	EfiTableHeader header;
 	EfiChar16 *firmware_vendor;
-	uint32_t firmware_revision;
+	u32 firmware_revision;
 	EfiHandle console_in_handle;
-	uint64_t console_in;// simple text input pointer
+	u64 console_in;// simple text input pointer
 	EfiHandle console_out_handle;
 	EfiSimpleTextOutput *console_out;
 	EfiHandle std_error_handle;
 	EfiSimpleTextOutput *std_error;
-	uint64_t runtime_services;   // runtime services pointer
+	u64 runtime_services;   // runtime services pointer
 	EfiBootServices *boot_services;
-	uint32_t num_table_entries;
-	uint64_t config_table;  // config table pointer
+	u32 num_table_entries;
+	u64 config_table;  // config table pointer
 } EfiSystemTable;
 
+// init global system table
 void efi_init(EfiSystemTable *st);
 
+// efi allocation function
 EfiStatus efi_alloc(EfiPhysicalAddress *buf);
 
+// efi free function
 EfiStatus efi_free(EfiPhysicalAddress buf);
 
+// efi print function
 EfiStatus efi_print_str16(EfiChar16 *str);
 
 #endif

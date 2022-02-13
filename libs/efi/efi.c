@@ -1,5 +1,6 @@
 #include <efi/efi.h>
 
+// global system table
 EfiSystemTable *system_table;
 
 void efi_init(EfiSystemTable *st) {

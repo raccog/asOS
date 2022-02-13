@@ -1,5 +1,6 @@
 #include <std/io.h>
 
+// memory for global printer
 Printer _printer;
 
 Printer printer() {
