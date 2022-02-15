@@ -8,7 +8,7 @@ BOOT_x86_64_LD = lld-link
 BOOT_x86_64_CFLAGS = -target x86_64-pc-unknown-windows -ffreestanding -mno-red-zone -std=c11 -Ilibs
 BOOT_x86_64_LDFLAGS = -flavor link -subsystem:efi_application -entry:efi_main
 
-BOOTLOADER_x86_64 = $(BOOT_x86_64_BUILD_DIR)/boot.efi
+BOOTLOADER_x86_64 = $(BOOT_x86_64_BUILD_DIR)/BOOTX64.EFI
 
 ALL += $(BOOTLOADER_x86_64)
 
@@ -28,5 +28,9 @@ $(CACHE_DIR)/OVMF.fd:
 run: $(BOOTLOADER_x86_64) $(CACHE_DIR)/OVMF.fd
 	@mkdir -p $(BUILD_DIR)/sysroot/EFI/BOOT
 	@cp $< $(BUILD_DIR)/sysroot/EFI/BOOT
-	qemu-system-x86_64 -bios $(CACHE_DIR)/OVMF.fd -drive file=fat:rw:$(BUILD_DIR)/sysroot,media=disk,format=raw -net none
+	qemu-system-x86_64 \
+		-serial mon:stdio \
+		-bios $(CACHE_DIR)/OVMF.fd \
+		-net none \
+		-drive file=fat:rw:$(BUILD_DIR)/sysroot,media=disk,format=raw
 

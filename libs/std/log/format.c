@@ -18,6 +18,8 @@ typedef struct {
     bool is_short;
     bool is_long;
     bool is_long_double;
+
+    bool capital_letters;
 } FormatDescriptor;
 
 // pads scanner with n characters
@@ -29,18 +31,24 @@ void pad_scanner(Scanner *scanner, char c, size_t n) {
 }
 
 // converts an integer's digits into characters and places them into a scanner's output buffer
+//
+// todo: add short and long range types
 void print_integer(Scanner *scanner, FormatDescriptor *descriptor, int value) {
     int divisor = 1;
     size_t digit_count = 0;
+    bool is_negative = false;
+    int extra_digit = 0;
+    int padding;
 
-    // place sign or space if needed
+    // check for negative integer
     if (value < 0) {
-        scanner_put_char(scanner, '-');
+        is_negative = true;
         value *= -1;
-    } else if (descriptor->force_positive_sign) {
-        scanner_put_char(scanner, '+');
-    } else if (descriptor->positive_space) {
-        scanner_put_char(scanner, ' ');
+    }
+
+    // check for extra sign digit
+    if (is_negative || descriptor->force_positive_sign || descriptor->positive_space) {
+        ++extra_digit;
     }
 
     // count the number of digits and get the maximum divisor that is a power of 10
@@ -50,26 +58,32 @@ void print_integer(Scanner *scanner, FormatDescriptor *descriptor, int value) {
     } while (value / divisor > 0);
     divisor /= 10;
 
-    // pad the buffer with spaces and/or zeros if needed
-    if (!descriptor->left_justify) {
-        if (descriptor->width > 0) {
-            if (descriptor->left_pad_zero && descriptor->precision == 0) {
-                // width > 0 AND pad zeros AND precision == 0
-                pad_scanner(scanner, '0', descriptor->width - digit_count);
-            } else if (descriptor->width > descriptor->precision) {
-                if (descriptor->precision > digit_count) {
-                    // width > 0 AND width > precision AND precision > digit count
-                    pad_scanner(scanner, ' ', descriptor->width - descriptor->precision);
-                    pad_scanner(scanner, '0', descriptor->precision - digit_count);
-                } else {
-                    // width > 0 AND width > precision AND precision <= digit count
-                    pad_scanner(scanner, ' ', descriptor->width - digit_count);
-                }
-            }
-        } else if (descriptor->precision > 0 && descriptor->precision > digit_count) {
-            // width == 0 AND precision > 0 AND precision > digit_count
-            pad_scanner(scanner, '0', descriptor->precision - digit_count);
+    // pad the buffer with spaces
+    if (!descriptor->left_justify && descriptor->width > 0) {
+        if ((descriptor->width > descriptor->precision + extra_digit) &&
+                (!descriptor->left_pad_zero && descriptor->precision > 0)) {
+            padding = (descriptor->precision > digit_count) ? descriptor->precision : digit_count;
+            padding = descriptor->width - padding;
+            padding -= extra_digit;
+            pad_scanner(scanner, ' ', padding);
         }
+    }
+
+    // place sign if needed
+    if (is_negative) {
+        scanner_put_char(scanner, '-');
+    } else if (descriptor->force_positive_sign) {
+        scanner_put_char(scanner, '+');
+    } else if (descriptor->positive_space) {
+        scanner_put_char(scanner, ' ');
+    }
+
+    // pad the buffer with zeros
+    if (descriptor->precision > 0) {
+        pad_scanner(scanner, '0', descriptor->precision - digit_count);
+    }
+    if (descriptor->width > 0 && descriptor->precision == 0 && descriptor->left_pad_zero) {
+        pad_scanner(scanner, '0', descriptor->width - digit_count - extra_digit);
     }
     
     // place digits in buffer
@@ -77,6 +91,72 @@ void print_integer(Scanner *scanner, FormatDescriptor *descriptor, int value) {
         scanner_put_char(scanner, '9' - (char)(9 - value / divisor));
         value = value % divisor;
         divisor /= 10;
+    }
+
+    // pad the right side of the buffer with spaces
+    if (descriptor->left_justify && descriptor->width > 0 &&
+            !(descriptor->left_pad_zero && descriptor->precision == 0)) {
+        padding = (descriptor->precision > digit_count) ? descriptor->precision : digit_count;
+        padding += extra_digit;
+        if (descriptor->width > padding) {
+            padding = descriptor->width - padding;
+            pad_scanner(scanner, ' ', padding);
+        }
+    }
+}
+
+// convert 4-bit number to a hex character
+char to_hex_char(FormatDescriptor *descriptor, u8 value) {
+    char c;
+
+    // digits from 0-9
+    if (value < 0xa) {
+        c = '9';
+        c -= (char)(0x9 - value);
+        return c;
+    }
+
+    // digits from a-f
+    if (descriptor->capital_letters) {
+        c = 'F';
+    } else {
+        c = 'f';
+    }
+    c -= (char)(0xf - value);
+    return c;
+}
+
+// print an unsigned, 32-bit integer in hex format
+void print_hex(Scanner *scanner, FormatDescriptor *descriptor, int value) {
+    char c;
+    u8 hex_val;
+    bool is_first = true;
+
+    // add '0x' or '0X' if needed
+    if (descriptor->pound) {
+        scanner_put_char(scanner, '0');
+        if (descriptor->capital_letters) {
+            c = 'X';
+        } else {
+            c = 'x';
+        }
+        scanner_put_char(scanner, c);
+    }
+
+    // print each hex value
+    for (int i = 7; i >= 0; --i) {
+        // get value of current hex digit
+        hex_val = (value >> (4 * i)) & 0xf;
+
+        // skip unneeded zeros
+        if (i + 1 > descriptor->precision && i != 0 && hex_val == 0 && is_first) {
+            continue;
+        }
+
+        // convert and print
+        c = to_hex_char(descriptor, hex_val);
+        scanner_put_char(scanner, c);
+        is_first = false;
     }
 }
 
@@ -248,6 +328,14 @@ bool parse_type(Scanner *scanner, FormatDescriptor *descriptor, va_list args) {
         case 'i':
             print_integer(scanner, descriptor, va_arg(args, int));
             break;
+        case 'X':
+            descriptor->capital_letters = true;
+            print_hex(scanner, descriptor, va_arg(args, int));
+            break;
+        case 'x':
+            descriptor->capital_letters = false;
+            print_hex(scanner, descriptor, va_arg(args, int));
+            break;
         default:
             return false;
     }
@@ -271,6 +359,7 @@ bool format_str(Scanner *scanner, va_list args) {
     descriptor.is_short = false;
     descriptor.is_long = false;
     descriptor.is_long_double = false;
+    descriptor.capital_letters = false;
 
     // parse each part of the format string
 

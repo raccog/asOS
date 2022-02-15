@@ -84,9 +84,26 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     log("Hello space padding:\r\n%5i", 5);
     log("Hello zero padding:\r\n%05i", 5);
     log("Hello zero precision padding:\r\n%.5i", 5);
-    log("Hello space and zero padding:\r\n%5.3i", 5);
+    log("Hello space and zero precision padding:\r\n%5.3i", 5);
+    log("Hello negative space and zero precision padding:\r\n%5.3i", -5);
+    log("Hello negative zero precision padding:\r\n%.5i", -5);
+    log("Hello negative space and zero padding:\r\n%05i", -5);
+    log("Hello left justify negative zero padding:\r\n%-05idone", -5);
+    log("Hello left justify zero padding:\r\n%-05idone", 5);
+    log("Hello left justify:\r\n%-5idone", 5);
+    log("Hello left justify negative:\r\n%-5idone", -5);
+    log("Hello left justify force positive:\r\n%-+5idone", 5);
+    log("Hello hex 0: %x", 0x0);
+    log("Hello hex ca: %x", 0xca);
+    log("Hello hex 4: %x", 0x4);
+    log("Hello hex deadbeef: %x", 0xdeadbeef);
+    log("Hello hex 0xdeadbeef: %#x", 0xdeadbeef);
+    log("Hello hex 0XDEADBEEF: %#X", 0xdeadbeef);
+    log("Hello hex 0x00000001: %#.32x", 0x1);
 
     log("Hello number: %i", 649);
+
+    while (true) {}
 
     return EFI_SUCCESS;
 
