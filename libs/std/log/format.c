@@ -131,6 +131,33 @@ void print_hex(Scanner *scanner, FormatDescriptor *descriptor, int value) {
     char c;
     u8 hex_val;
     bool is_first = true;
+    size_t char_count = 0, hex_count = 0;
+
+    // count the number of characters that will be displayed
+    // this is used for padding
+    if (descriptor->pound) {
+        char_count += 2;
+    }
+    // count number of leading zeros
+    for (int i = 7; i >= 0; --i) {
+        if (((value >> (i * 4)) & 0xf) == 0) {
+            continue;
+        }
+        hex_count = i + 1;
+        break;
+    }
+    // compare leading zeros to precision
+    if (descriptor->precision > hex_count) {
+        hex_count = descriptor->precision;
+    }
+    char_count += hex_count;
+
+    // pad if needed
+    if (descriptor->width > char_count) {
+        for (size_t i = 0; i < descriptor->width - char_count; ++i) {
+            scanner_put_char(scanner, ' ');
+        }
+    }
 
     // add '0x' or '0X' if needed
     if (descriptor->pound) {
@@ -141,6 +168,11 @@ void print_hex(Scanner *scanner, FormatDescriptor *descriptor, int value) {
             c = 'x';
         }
         scanner_put_char(scanner, c);
+    }
+
+    // add extra zeros if needed
+    for (size_t i = 8; i < descriptor->precision; ++i) {
+        scanner_put_char(scanner, '0');
     }
 
     // print each hex value

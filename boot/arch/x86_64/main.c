@@ -99,7 +99,10 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     log("Hello hex deadbeef: %x", 0xdeadbeef);
     log("Hello hex 0xdeadbeef: %#x", 0xdeadbeef);
     log("Hello hex 0XDEADBEEF: %#X", 0xdeadbeef);
-    log("Hello hex 0x00000001: %#.32x", 0x1);
+    log("Hello hex 0x00000001: %#.8x", 0x1);
+    log("Hello hex 0x000000001: %#.9x", 0x1);
+    log("Hello hex with padding:\r\n"
+        "          0x00000001:\r\n%#20.8x", 0x1);
 
     log("Hello number: %i", 649);
 

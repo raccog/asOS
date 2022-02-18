@@ -18,14 +18,6 @@ $(STD_LIB): $(STD_OBJ)
 	@$(MKCWD)
 	$(STD_AR) rcs $@ $^
 
-$(STD_BUILD_DIR)/log/%.c.o: $(STD_DIR)/log/%.c
-	@$(MKCWD)
-	$(STD_CC) $(STD_CFLAGS) -c -o $@ $<
-
-$(STD_BUILD_DIR)/alloc/%.c.o: $(STD_DIR)/alloc/%.c
-	@$(MKCWD)
-	$(STD_CC) $(STD_CFLAGS) -c -o $@ $<
-
 $(STD_BUILD_DIR)/%.c.o: $(STD_DIR)/%.c
 	@$(MKCWD)
 	$(STD_CC) $(STD_CFLAGS) -c -o $@ $<
