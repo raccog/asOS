@@ -180,13 +180,13 @@ typedef struct {
 } EfiSystemTable;
 
 // init global system table
-void efi_init(EfiSystemTable *st);
+EfiStatus efi_init(EfiSystemTable *st);
 
-// efi allocation function
-EfiStatus efi_alloc(EfiPhysicalAddress *buf);
+// efi page allocation function
+EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages);
 
-// efi free function
-EfiStatus efi_free(EfiPhysicalAddress buf);
+// efi page free function
+EfiStatus efi_page_free(EfiPhysicalAddress buf);
 
 // efi print function
 EfiStatus efi_print_str16(EfiChar16 *str);

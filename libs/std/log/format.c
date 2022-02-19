@@ -4,6 +4,9 @@
 #include <std/io.h>
 #include <std/log.h>
 
+// print buffer
+char *print_buffer;
+
 void print_hex(Scanner *scanner, int value) {
     scanner_put_char(scanner, '0');
     scanner_put_char(scanner, 'x');
@@ -91,9 +94,7 @@ void simple_printf(const char *fmt, ...) {
     scanner_init(&scanner);
     va_start(args, fmt);
     scanner.in_buf = fmt;
-
-    // allocate char buffer
-    alloc().alloc((u8 **)&scanner.out_buf, 0);
+    scanner.out_buf = print_buffer;
 
     while ((c = scanner_next_char(&scanner)) != '\0') {
         if (c == '%') {
@@ -137,4 +138,9 @@ void simple_printf(const char *fmt, ...) {
     alloc().free((u8 *)scanner.out_buf);
 
     va_end(args);
+}
+
+void init_print_buffer() {
+    // allocate char buffer
+    alloc().alloc((u8 **)&print_buffer, 1024);
 }

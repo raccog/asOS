@@ -1,14 +1,39 @@
 #include <efi/efi.h>
 
+#include <std/alloc.h>
+
 // global system table
 EfiSystemTable *system_table;
 
-void efi_init(EfiSystemTable *st) {
-    system_table = st;
+// efi allocator functions
+u8 *efi_buffer;
+Allocator efi_allocator;
+
+bool efi_alloc(u8 **ptr, size_t bytes) {
+    *ptr = efi_buffer;
+    efi_buffer += bytes;
+    return true;
 }
 
-EfiStatus efi_alloc(EfiPhysicalAddress *buf) {
-    EfiStatus status = system_table->boot_services->allocate_pages(AllocateAnyPages, EfiLoaderData, 1, buf);
+void efi_free(u8 *_) {
+    return;
+}
+
+EfiStatus efi_init(EfiSystemTable *st) {
+    // set global system table
+    system_table = st;
+
+    // set efi allocator functions
+    efi_allocator.alloc = &efi_alloc;
+    efi_allocator.free = &efi_free;
+    init_alloc(efi_allocator);
+
+    // allocate pages for efi buffer
+    return efi_page_alloc((EfiPhysicalAddress *)&efi_buffer, 8); // 8 pages
+}
+
+EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages) {
+    EfiStatus status = system_table->boot_services->allocate_pages(AllocateAnyPages, EfiLoaderData, num_pages, buf);
     if (status != EFI_SUCCESS) {
         system_table->console_out->output_string(system_table->console_out, L"Error durring memory allocation\r\n");
         return status;
@@ -17,7 +42,7 @@ EfiStatus efi_alloc(EfiPhysicalAddress *buf) {
     return EFI_SUCCESS;
 }
 
-EfiStatus efi_free(EfiPhysicalAddress buf) {
+EfiStatus efi_page_free(EfiPhysicalAddress buf) {
     EfiStatus status = system_table->boot_services->free_pages(buf, 1);
     if (status != EFI_SUCCESS) {
         system_table->console_out->output_string(system_table->console_out, L"Error durring memory free\r\n");

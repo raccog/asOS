@@ -8,4 +8,6 @@
 
 void simple_printf(const char *fmt, ...);
 
+void init_print_buffer();
+
 #endif
