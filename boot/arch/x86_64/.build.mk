@@ -29,7 +29,7 @@ run: $(BOOTLOADER_x86_64) $(CACHE_DIR)/OVMF.fd
 	@mkdir -p $(BUILD_DIR)/sysroot/EFI/BOOT
 	@cp $< $(BUILD_DIR)/sysroot/EFI/BOOT
 	qemu-system-x86_64 \
-		-serial mon:stdio \
+		-nographic \
 		-bios $(CACHE_DIR)/OVMF.fd \
 		-net none \
 		-drive file=fat:rw:$(BUILD_DIR)/sysroot,media=disk,format=raw

@@ -4,6 +4,12 @@ STD_SRC = 	$(STD_DIR)/log/scanner.c \
 			$(STD_DIR)/log/format.c \
 			$(STD_DIR)/alloc/alloc.c \
 			$(STD_DIR)/io/io.c
+STD_H = 	$(STD_DIR)/alloc.h \
+			$(STD_DIR)/arg.h \
+			$(STD_DIR)/bool.h \
+			$(STD_DIR)/io.h \
+			$(STD_DIR)/int.h \
+			$(STD_DIR)/log.h
 STD_OBJ = $(patsubst $(STD_DIR)/%, $(STD_BUILD_DIR)/%.o, $(STD_SRC))
 
 STD_CC = clang
@@ -14,7 +20,7 @@ STD_LIB = $(STD_BUILD_DIR)/libstd.a
 
 ALL += $(STD_LIB)
 
-$(STD_LIB): $(STD_OBJ)
+$(STD_LIB): $(STD_OBJ) $(STD_H)
 	@$(MKCWD)
 	$(STD_AR) rcs $@ $^
 

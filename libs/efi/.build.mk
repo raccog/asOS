@@ -1,6 +1,7 @@
 EFI_DIR = libs/efi
 EFI_BUILD_DIR = $(BUILD_DIR)/$(EFI_DIR)
 EFI_SRC = $(EFI_DIR)/efi.c
+EFI_H = $(EFI_DIR)/efi.h
 EFI_OBJ = $(patsubst $(EFI_DIR)/%, $(EFI_BUILD_DIR)/%.o, $(EFI_SRC))
 
 EFI_CC = clang
@@ -11,7 +12,7 @@ EFI_LIB = $(EFI_BUILD_DIR)/libefi.a
 
 ALL += $(EFI_LIB)
 
-$(EFI_LIB): $(EFI_OBJ)
+$(EFI_LIB): $(EFI_OBJ) $(EFI_H)
 	@$(MKCWD)
 	$(EFI_AR) rcs $@ $^
 

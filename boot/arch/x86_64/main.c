@@ -78,33 +78,17 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
 
     // test log function
     st->console_out->clear_screen(st->console_out);
-    log("Hello World!!! :D");
-    log("Hello zero: %i", 0);
-    log("Hello negative: %i", -500);
-    log("Hello space padding:\r\n%5i", 5);
-    log("Hello zero padding:\r\n%05i", 5);
-    log("Hello zero precision padding:\r\n%.5i", 5);
-    log("Hello space and zero precision padding:\r\n%5.3i", 5);
-    log("Hello negative space and zero precision padding:\r\n%5.3i", -5);
-    log("Hello negative zero precision padding:\r\n%.5i", -5);
-    log("Hello negative space and zero padding:\r\n%05i", -5);
-    log("Hello left justify negative zero padding:\r\n%-05idone", -5);
-    log("Hello left justify zero padding:\r\n%-05idone", 5);
-    log("Hello left justify:\r\n%-5idone", 5);
-    log("Hello left justify negative:\r\n%-5idone", -5);
-    log("Hello left justify force positive:\r\n%-+5idone", 5);
-    log("Hello hex 0: %x", 0x0);
-    log("Hello hex ca: %x", 0xca);
-    log("Hello hex 4: %x", 0x4);
-    log("Hello hex deadbeef: %x", 0xdeadbeef);
-    log("Hello hex 0xdeadbeef: %#x", 0xdeadbeef);
-    log("Hello hex 0XDEADBEEF: %#X", 0xdeadbeef);
-    log("Hello hex 0x00000001: %#.8x", 0x1);
-    log("Hello hex 0x000000001: %#.9x", 0x1);
-    log("Hello hex with padding:\r\n"
-        "          0x00000001:\r\n%#20.8x", 0x1);
-
-    log("Hello number: %i", 649);
+    simple_printf("Hello kernel!\n");
+    simple_printf("Hello hex number 1: %x!\n", 0x1);
+    simple_printf("Hello hex number deadbeef: %x!\n", 0xdeadbeef);
+    simple_printf("Hello integer number 1: %i!\n", 1);
+    simple_printf("Hello integer number 1234: %i!\n", 1234);
+    simple_printf("Hello integer number -1234: %i!\n", -1234);
+    simple_printf("Hello string kernel: %s!\n", "kernel");
+    simple_printf("Hello char a: %c!\n", 'a');
+    simple_printf("Hello ptr deadbeefdeadbeef: %p!\n", 0xdeadbeefdeadbeef);
+    simple_printf("Hello bits 0000 0000 0000 1111: %b!\n", 15);
+    simple_printf("Hello bits 0000 0000 0001 0000: %b!\n", 16);
 
     while (true) {}
 

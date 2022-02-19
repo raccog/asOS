@@ -1,5 +1,6 @@
 *.bin
 *.swp
+*.backup
 *.o
 
 Build/
