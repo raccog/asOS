@@ -20,11 +20,11 @@ STD_LIB = $(STD_BUILD_DIR)/libstd.a
 
 ALL += $(STD_LIB)
 
-$(STD_LIB): $(STD_OBJ) $(STD_H)
+$(STD_LIB): $(STD_OBJ)
 	@$(MKCWD)
 	$(STD_AR) rcs $@ $^
 
-$(STD_BUILD_DIR)/%.c.o: $(STD_DIR)/%.c
+$(STD_BUILD_DIR)/%.c.o: $(STD_DIR)/%.c $(STD_H)
 	@$(MKCWD)
 	$(STD_CC) $(STD_CFLAGS) -c -o $@ $<
 

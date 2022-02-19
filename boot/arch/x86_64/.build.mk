@@ -9,14 +9,16 @@ BOOT_x86_64_CFLAGS = -target x86_64-pc-unknown-windows -ffreestanding -mno-red-z
 BOOT_x86_64_LDFLAGS = -flavor link -subsystem:efi_application -entry:efi_main
 
 BOOTLOADER_x86_64 = $(BOOT_x86_64_BUILD_DIR)/BOOTX64.EFI
+BOOTLOADER_x86_64_H = $(STD_H) $(EFI_H)
+BOOTLOADER_x86_64_LIBS = $(STD_LIB) $(EFI_LIB)
 
 ALL += $(BOOTLOADER_x86_64)
 
-$(BOOTLOADER_x86_64): $(BOOT_x86_64_OBJ) $(STD_LIB) $(EFI_LIB)
+$(BOOTLOADER_x86_64): $(BOOT_x86_64_OBJ) $(BOOTLOADER_x86_64_LIBS)
 	@$(MKCWD)
 	$(BOOT_x86_64_LD) $(BOOT_x86_64_LDFLAGS) -out:$@ $^
 
-$(BOOT_x86_64_BUILD_DIR)/%.c.o: $(BOOT_x86_64_DIR)/%.c
+$(BOOT_x86_64_BUILD_DIR)/%.c.o: $(BOOT_x86_64_DIR)/%.c $(BOOTLOADER_x86_64_H)
 	@$(MKCWD)
 	$(BOOT_x86_64_CC) $(BOOT_x86_64_CFLAGS) -c -o $@ $<
 

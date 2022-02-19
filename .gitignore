@@ -2,6 +2,7 @@
 *.swp
 *.backup
 *.o
+*tags
 
 Build/
 Toolchain/

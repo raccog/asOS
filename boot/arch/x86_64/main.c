@@ -78,17 +78,18 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
 
     // test log function
     st->console_out->clear_screen(st->console_out);
-    simple_printf("Hello kernel!\n");
-    simple_printf("Hello hex number 1: %x!\n", 0x1);
-    simple_printf("Hello hex number deadbeef: %x!\n", 0xdeadbeef);
-    simple_printf("Hello integer number 1: %i!\n", 1);
-    simple_printf("Hello integer number 1234: %i!\n", 1234);
-    simple_printf("Hello integer number -1234: %i!\n", -1234);
-    simple_printf("Hello string kernel: %s!\n", "kernel");
-    simple_printf("Hello char a: %c!\n", 'a');
-    simple_printf("Hello ptr deadbeefdeadbeef: %p!\n", 0xdeadbeefdeadbeef);
-    simple_printf("Hello bits 0000 0000 0000 1111: %b!\n", 15);
-    simple_printf("Hello bits 0000 0000 0001 0000: %b!\n", 16);
+    simple_log("Hello kernel!");
+    simple_log("Hello hex number 1: %x!", 0x1);
+    simple_log("Hello hex number deadbeef: %x!", 0xdeadbeef);
+    simple_log("Hello integer number 1: %i!", 1);
+    simple_log("Hello integer number 1234: %i!", 1234);
+    simple_log("Hello integer number -1234: %i!", -1234);
+    simple_log("Hello string kernel: %s!", "kernel");
+    simple_log("Hello char a: %c!", 'a');
+    simple_log("Hello ptr deadbeefdeadbeef: %p!", 0xdeadbeefdeadbeef);
+    simple_log("Hello bits 0000 0000 0000 1111: %b!", 15);
+    simple_log("Hello bits 0000 0000 0001 0000: %b!", 16);
+
 
     while (true) {}
 

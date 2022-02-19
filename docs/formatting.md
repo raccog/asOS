@@ -1,5 +1,8 @@
 # Formatting
 
+NOTE: Currently, the macros described in this document are not implemented.
+See [Simple Formatting](./simple_formatting.md) for a description of the currently implemented output macros.
+
 Formatting rules for printing macros ```kprint```, ```kerror```, ```kpanic```, and ```klog```.
 
 These macros allow for outputing text at any place in the kernel.

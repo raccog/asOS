@@ -12,11 +12,11 @@ EFI_LIB = $(EFI_BUILD_DIR)/libefi.a
 
 ALL += $(EFI_LIB)
 
-$(EFI_LIB): $(EFI_OBJ) $(EFI_H)
+$(EFI_LIB): $(EFI_OBJ)
 	@$(MKCWD)
 	$(EFI_AR) rcs $@ $^
 
-$(EFI_BUILD_DIR)/%.c.o: $(EFI_DIR)/%.c
+$(EFI_BUILD_DIR)/%.c.o: $(EFI_DIR)/%.c $(EFI_H)
 	@$(MKCWD)
 	$(EFI_CC) $(EFI_CFLAGS) -c -o $@ $<
 

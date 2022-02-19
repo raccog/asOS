@@ -3,8 +3,8 @@
 
 #include <std/log/scanner.h>
 
-// formats additional arguments according to c printf rules
-//void log(const char *fmt, ...);
+#define simple_log(fmt, ...) \
+    simple_printf("[%s:%i] " fmt "\n", __FILE__, __LINE__, __VA_ARGS__)
 
 void simple_printf(const char *fmt, ...);
 
