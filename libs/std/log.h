@@ -8,6 +8,10 @@
 
 void simple_printf(const char *fmt, ...);
 
-void init_print_buffer();
+// allocates print buffer using dynamic allocator
+void alloc_print_buffer();
+
+// allocates print buffer using stack
+void stack_alloc_print_buffer();
 
 #endif

@@ -1,6 +1,8 @@
 #include <efi/efi.h>
 
 #include <std/alloc.h>
+#include <std/io.h>
+#include <std/log.h>
 
 // global system table
 EfiSystemTable *system_table;
@@ -35,7 +37,7 @@ EfiStatus efi_init(EfiSystemTable *st) {
 EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages, EfiAllocateType alloc_type) {
     EfiStatus status = system_table->boot_services->allocate_pages(alloc_type, EfiLoaderData, num_pages, buf);
     if (status != EFI_SUCCESS) {
-        system_table->console_out->output_string(system_table->console_out, L"Error durring memory allocation\r\n");
+        simple_log("Error during UEFI page allocation. Code: %i", status);
         return status;
     }
 
@@ -45,7 +47,7 @@ EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages, EfiAllocateT
 EfiStatus efi_page_free(EfiPhysicalAddress buf) {
     EfiStatus status = system_table->boot_services->free_pages(buf, 1);
     if (status != EFI_SUCCESS) {
-        system_table->console_out->output_string(system_table->console_out, L"Error durring memory free\r\n");
+        simple_log("Error during UEFI page free. Code: %i", status);
         return status;
     }
 
@@ -55,7 +57,6 @@ EfiStatus efi_page_free(EfiPhysicalAddress buf) {
 EfiStatus efi_print_str16(EfiChar16 *str) {
     EfiStatus status = system_table->console_out->output_string(system_table->console_out, str);
     if (status != EFI_SUCCESS) {
-        system_table->console_out->output_string(system_table->console_out, L"Error printing buffer\r\n");
         return status;
     }
 
