@@ -45,7 +45,7 @@ void print_int(Scanner *scanner, int value) {
     }
 
     // count number of digits
-    for (divisor = 10; divisor < value; divisor *= 10) {
+    for (divisor = 10; divisor <= value; divisor *= 10) {
         ++digits;
     }
     divisor /= 10;
