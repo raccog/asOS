@@ -123,6 +123,7 @@ typedef struct {
 typedef EfiStatus (*EfiAllocatePages)(EfiAllocateType type, EfiMemoryType memory_type, u64 pages, EfiPhysicalAddress *memory);
 typedef EfiStatus (*EfiFreePages)(EfiPhysicalAddress memory, u64 pages);
 typedef EfiStatus (*EfiGetMemoryMap)(u64 *memory_map_size, struct _EfiMemoryDescriptor *memory_map, u64 *map_key, u64 *descriptor_size, u32 *descriptor_version);
+typedef EfiStatus (*EfiSetWatchdogTimer)(u64 timeout, u64 code, u64 data_size, EfiChar16 *data);
 
 typedef struct {
     EfiTableHeader header;
@@ -155,7 +156,7 @@ typedef struct {
     void *exit_boot_services;
     void *get_next_monotonic_count;
     void *stall;
-    void *set_watchdog_timer;
+    EfiSetWatchdogTimer set_watchdog_timer;
     void *connect_controller;
     void *disconnect_controller;
     void *open_protocol;

@@ -61,6 +61,7 @@ const char *mmap_kind(SunnyMemoryMapKind kind) {
 
 void output_mmap(SunnyMemoryMap *mmap) {
     SunnyMemoryMapDescriptor *largest_free_descriptor = 0;
+    size_t total_free = 0;
 
     // print memory map details
     simple_log("Descriptor entries: %i", mmap->entries);
@@ -76,6 +77,7 @@ void output_mmap(SunnyMemoryMap *mmap) {
     for (int i = 0; i < mmap->entries; ++i) {
         SunnyMemoryMapDescriptor *descriptor = mmap->descriptors + i * sizeof(SunnyMemoryMapDescriptor);
         if (descriptor->kind == SunnyFree) {
+            total_free += descriptor->size;
             if (largest_free_descriptor == 0 || descriptor->size > largest_free_descriptor->size) {
                 largest_free_descriptor = descriptor;
             }
@@ -83,7 +85,8 @@ void output_mmap(SunnyMemoryMap *mmap) {
     }
 
     const char *kind_buf = mmap_kind(largest_free_descriptor->kind);
-    simple_log("Largest free: %x-%x, Size: %iKB", largest_free_descriptor->start, largest_free_descriptor->start + largest_free_descriptor->size, largest_free_descriptor->size >> 10);
+    simple_log("Largest free: %x-%x, Size: %iMB", largest_free_descriptor->start, largest_free_descriptor->start + largest_free_descriptor->size, largest_free_descriptor->size >> 20);
+    simple_log("Total free: %iMB", total_free >> 20);
 }
 
 EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
@@ -96,6 +99,9 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     if ((status = efi_init(st)) != EFI_SUCCESS) {
         return status;
     }
+
+    // disable watchdog timer
+    st->boot_services->set_watchdog_timer(0, 0, 0, 0);
 
     // init printer
     printer.output_string = &output_string;
