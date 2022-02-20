@@ -13,8 +13,14 @@ CACHE_DIR := $(BUILD_DIR)/cache
 
 MKCWD = mkdir -p $(@D)
 
+# Libs
 include libs/std/.build.mk
 include libs/efi/.build.mk
+
+# Kernel lib
+include libs/sunny/.build.mk
+
+# Bootloader
 include boot/arch/x86_64/.build.mk
 
 .PHONY: all

@@ -1,5 +1,5 @@
-#ifndef LOG_H
-#define LOG_H
+#ifndef STD_LOG_H
+#define STD_LOG_H
 
 #include <std/log/scanner.h>
 

@@ -1,3 +1,6 @@
+#ifndef STD_ALLOC_H
+#define STD_ALLOC_H
+
 #include <std/bool.h>
 #include <std/int.h>
 
@@ -15,3 +18,5 @@ Allocator alloc();
 
 // init global allocator
 void init_alloc(Allocator allocator);
+
+#endif

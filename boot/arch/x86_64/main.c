@@ -3,6 +3,7 @@
 #include <std/int.h>
 #include <std/io.h>
 #include <std/log.h>
+#include <sunny/mmap.h>
 
 EfiChar16 *char16_buf;
 
@@ -41,65 +42,55 @@ void __chkstk(void) {
 }
 
 // returns a string describing an efi memory type
-const char *mmap_type(EfiMemoryType type) {
-    switch (type) {
-        case EfiReservedMemoryType:
+const char *mmap_kind(SunnyMemoryMapKind kind) {
+    switch (kind) {
+        case SunnyReserved:
             return "Reserved";
-        case EfiLoaderCode:
-            return "Loader Code";
-        case EfiLoaderData:
-            return "Loader Data";
-        case EfiBootServicesCode:
-            return "Boot Services Code";
-        case EfiBootServicesData:
-            return "Boot Services Data";
-        case EfiRuntimeServicesCode:
-            return "Runtime Services Code";
-        case EfiRuntimeServicesData:
-            return "Runtime Services Data";
-        case EfiConventionalMemory:
-            return "Conventional";
-        case EfiUnusableMemory:
-            return "Unusable";
-        case EfiACPIReclaimMemory:
-            return "ACPI Reclaim";
-        case EfiACPIMemoryNVS:
-            return "ACPI NVS";
-        case EfiMemoryMappedIO:
-            return "Memory Mapped IO";
-        case EfiMemoryMappedIOPortSpace:
-            return "Memory Mapped IO Port Space";
-        case EfiPalCode:
-            return "Pal Code";
-        case EfiPersistentMemory:
-            return "Persistent";
+        case SunnyFree:
+            return "Free";
+        case SunnyReclaimable:
+            return "Reclaimable";
+        case SunnyLoader:
+            return "Loader";
+        case SunnyKernel:
+            return "Kernel";
         default:
             return "Unknown";
     }
 }
 
-void output_mmap(EfiMemoryDescriptor *mmap, u64 mmap_key, u64 mmap_size, u64 descriptor_size, u32 descriptor_version) {
+void output_mmap(SunnyMemoryMap *mmap) {
+    SunnyMemoryMapDescriptor *largest_free_descriptor = 0;
+
     // print memory map details
-    simple_log("Memory map key: %i", mmap_key);
-    simple_log("Memory map descriptor version: %i", descriptor_version);
-    simple_log("Num descriptors: %i", mmap_size / descriptor_size);
-    simple_log("Descriptor size: %i", descriptor_size);
-    simple_log("Physical Start - Physical End | ID | Type");
+    simple_log("Descriptor entries: %i", mmap->entries);
+    simple_log("Physical Start - Physical End | ID | Kind");
 
     // print each memory map descriptor
-    for (int i = 0; i < mmap_size / descriptor_size; ++i) {
-        // Conversion to void pointer is necessary to bypass struct alignment.
-        // This is because the size of an EfiMemoryDescriptor struct might not be the same as the actual
-        // descriptor size.
-        EfiMemoryDescriptor *descriptor = (EfiMemoryDescriptor *)((void *)mmap + descriptor_size * i);
-        const char *type_buf = mmap_type((EfiMemoryType)descriptor->type);
-        simple_log("%x-%x: %i %s", descriptor->physical_start, descriptor->physical_start + (descriptor->num_pages << 12), i, type_buf);
+    for (int i = 0; i < mmap->entries; ++i) {
+        SunnyMemoryMapDescriptor *descriptor = mmap->descriptors + i * sizeof(SunnyMemoryMapDescriptor);
+        const char *kind_buf = mmap_kind(descriptor->kind);
+        simple_log("%x-%x: %i %s", descriptor->start, descriptor->start + descriptor->size, i, kind_buf);
     }
+
+    for (int i = 0; i < mmap->entries; ++i) {
+        SunnyMemoryMapDescriptor *descriptor = mmap->descriptors + i * sizeof(SunnyMemoryMapDescriptor);
+        if (descriptor->kind == SunnyFree) {
+            if (largest_free_descriptor == 0 || descriptor->size > largest_free_descriptor->size) {
+                largest_free_descriptor = descriptor;
+            }
+        }
+    }
+
+    const char *kind_buf = mmap_kind(largest_free_descriptor->kind);
+    simple_log("Largest free: %x-%x, Size: %iKB", largest_free_descriptor->start, largest_free_descriptor->start + largest_free_descriptor->size, largest_free_descriptor->size >> 10);
 }
 
 EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     Printer printer;
     EfiStatus status;
+    EfiMemoryMap efi_mmap;
+    SunnyMemoryMap sunny_mmap;
 
     // init EFI system table
     if ((status = efi_init(st)) != EFI_SUCCESS) {
@@ -110,23 +101,23 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     printer.output_string = &output_string;
     init_printer(printer);
 
-    // allocate output buffers
+    // allocate buffers
     init_print_buffer();
     alloc().alloc((u8 **)&char16_buf, 2048);
+    size_t efi_mmap_size = sizeof(EfiMemoryDescriptor) * 0xff;
+    alloc().alloc((u8 **)&efi_mmap.descriptors, efi_mmap_size);
 
     // get memory map
-    EfiMemoryDescriptor mmap[0xff];
-    u64 mmap_size = sizeof(EfiMemoryDescriptor) * 0xff;
-    u64 mmap_key, descriptor_size;
-    u32 descriptor_version;
-    status = st->boot_services->get_memory_map(&mmap_size, &mmap[0], &mmap_key, &descriptor_size, &descriptor_version);
+    status = st->boot_services->get_memory_map(&efi_mmap_size, efi_mmap.descriptors, &efi_mmap.key, &efi_mmap.descriptor_size, &efi_mmap.version);
+    efi_mmap.entries = efi_mmap_size / efi_mmap.descriptor_size;
     if (status != EFI_SUCCESS) {
         return status;
     }
 
     // output memory map
     st->console_out->clear_screen(st->console_out);
-    output_mmap(mmap, mmap_key, mmap_size, descriptor_size, descriptor_version);
+    to_sunny_mmap(&efi_mmap, &sunny_mmap);
+    output_mmap(&sunny_mmap);
 
     // test log function
     simple_log("Hello kernel!");

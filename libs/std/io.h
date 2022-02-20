@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef STD_IO_H
+#define STD_IO_H
 
 typedef void (*OutputStringFunc)(const char *);
 

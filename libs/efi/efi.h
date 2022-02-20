@@ -112,6 +112,14 @@ typedef struct _EfiMemoryDescriptor {
     u64 attribute;
 } EfiMemoryDescriptor;
 
+typedef struct {
+    EfiMemoryDescriptor *descriptors;
+    u64 entries;
+    u64 descriptor_size;
+    u64 key;
+    u32 version;
+} EfiMemoryMap;
+
 typedef EfiStatus (*EfiAllocatePages)(EfiAllocateType type, EfiMemoryType memory_type, u64 pages, EfiPhysicalAddress *memory);
 typedef EfiStatus (*EfiFreePages)(EfiPhysicalAddress memory, u64 pages);
 typedef EfiStatus (*EfiGetMemoryMap)(u64 *memory_map_size, struct _EfiMemoryDescriptor *memory_map, u64 *map_key, u64 *descriptor_size, u32 *descriptor_version);

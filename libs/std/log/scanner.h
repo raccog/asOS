@@ -1,5 +1,5 @@
-#ifndef SCANNER_H
-#define SCANNER_H
+#ifndef STD_LOG_SCANNER_H
+#define STD_LOG_SCANNER_H
 
 // scanner contains input and output buffers and maintains separate indices for each
 typedef struct {
