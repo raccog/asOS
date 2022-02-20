@@ -105,6 +105,7 @@ typedef struct _EfiSimpleTextOutput {
 
 typedef struct _EfiMemoryDescriptor {
     u32 type;
+    u32 _pad1;
     EfiPhysicalAddress physical_start;
     EfiVirtualAddress virtual_start;
     u64 num_pages;
@@ -183,7 +184,7 @@ typedef struct {
 EfiStatus efi_init(EfiSystemTable *st);
 
 // efi page allocation function
-EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages);
+EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages, EfiAllocateType alloc_type);
 
 // efi page free function
 EfiStatus efi_page_free(EfiPhysicalAddress buf);

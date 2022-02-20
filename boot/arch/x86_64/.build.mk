@@ -34,5 +34,6 @@ run: $(BOOTLOADER_x86_64) $(CACHE_DIR)/OVMF.fd
 		-nographic \
 		-bios $(CACHE_DIR)/OVMF.fd \
 		-net none \
-		-drive file=fat:rw:$(BUILD_DIR)/sysroot,media=disk,format=raw
+		-drive file=fat:rw:$(BUILD_DIR)/sysroot,media=disk,format=raw \
+		-m 128M
 
