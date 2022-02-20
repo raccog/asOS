@@ -2,6 +2,25 @@
 
 asOS (Always Sunny Operating System) is my solo hobby OS project (though feedback is always welcome :D).
 
+Currently, I am working on the custom UEFI bootloader.
+
+## Build Instructions
+
+To build all libraries and executables, run ```make all``` from the main directory.
+Make sure you have all dependencies (listed below) installed before building.
+
+To build and run the bootloader, run ```make run```.
+
+### Dependencies
+
+- qemu-system-x86_64
+- clang
+- make
+- lld (llvm linker)
+- llvm-ar (llvm archiver)
+- wget
+- essential commands (mkdir, mv, cp)
+
 ## Purpose
 
 Starting with basic processes (after the bootloader), I am working through parts of an operating system as I learn about them.
@@ -16,7 +35,3 @@ My underlying goals for this project are to:
 Also learn more about tools I already use such as make and git.
 * Learn about standards such as file systems, executable formats (elf), posix compatibility, etc.
 * My main goal is to have fun.
-
-## Current Major Goal
-
-The current major goal is to create a UEFI bootloader that loads the main kernel into memory.
