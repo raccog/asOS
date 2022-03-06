@@ -5,6 +5,6 @@
 #include <std/printf.h>
 
 #define simple_log(fmt, ...) \
-    simple_printf("[%s-%s:%i:%s] " fmt "\n", __LIB__, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
+    simple_printf("[%s-%s:%s:%i] " fmt "\n", __LIB__, __FILE__, __func__, __LINE__, ##__VA_ARGS__)
 
 #endif

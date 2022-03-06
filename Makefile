@@ -12,11 +12,11 @@ all: bootloader
 .PHONY: all
 
 clean: 
-	rm -rf $(BIN_DIR)/{sysroot,x86_64-pc-unknown-windows,bootx64.efi}
+	rm -rf build/*
 .PHONY: clean
 
 nuke:
-	rm -rf $(BIN_DIR)
+	rm -rf build
 .PHONY: nuke
 
 bootloader:
