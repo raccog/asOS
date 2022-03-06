@@ -1,30 +1,31 @@
-#ifndef SUNNY_MMAP_H
-#define SUNNY_MMAP_H
+#ifndef HW_MMAP_H
+#define HW_MMAP_H
 
 #include <hw/efi/efi.h>
 #include <std/std.h>
 
-typedef u64 SunnyMemoryAddress;
+typedef u64 OSMemoryAddress;
 
 typedef enum {
-    SunnyFree,
-    SunnyReclaimable,
-    SunnyReserved,
-    SunnyLoader,
-    SunnyKernel,
-} SunnyMemoryMapKind;
+    OSFree,
+    OSReclaimable,
+    OSReserved,
+    OSLoader,
+    OSKernel,
+} OSMemoryKind;
 
 typedef struct {
-    SunnyMemoryMapKind kind;
-    SunnyMemoryAddress start;
+    OSMemoryKind kind;
+    OSMemoryAddress start;
     size_t size;
-} SunnyMemoryMapDescriptor;
+} OSMemoryDescriptor;
 
 typedef struct {
-    SunnyMemoryMapDescriptor *descriptors;
+    OSMemoryDescriptor *descriptors;
     size_t entries;
-} SunnyMemoryMap;
+} OSMemoryMap;
 
-void to_sunny_mmap(const EfiMemoryMap *efi_mmap, SunnyMemoryMap *sunny_mmap);
+void output_mmap(OSMemoryMap *mmap);
+void to_os_mmap(const EfiMemoryMap *efi_mmap, OSMemoryMap *OS_mmap);
 
 #endif

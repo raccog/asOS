@@ -5,8 +5,8 @@
  * Other parts are taken from the brutal project EFI loader (https://github.com/brutal-org/brutal) and the UEFI specifications 
  */
 
-#ifndef EFI_H
-#define EFI_H
+#ifndef HW_EFI_H
+#define HW_EFI_H
 
 #include <std/std.h>
 
@@ -187,17 +187,5 @@ typedef struct {
 	u32 num_table_entries;
 	u64 config_table;  // config table pointer
 } EfiSystemTable;
-
-// init global system table
-EfiStatus efi_init(EfiSystemTable *st);
-
-// efi page allocation function
-EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages, EfiAllocateType alloc_type);
-
-// efi page free function
-EfiStatus efi_page_free(EfiPhysicalAddress buf);
-
-// efi print function
-EfiStatus efi_print_str16(EfiChar16 *str);
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef SUNNY_PRINTER_H
-#define SUNNY_PRINTER_H
+#ifndef STD_PRINTER_H
+#define STD_PRINTER_H
 
 typedef void (*OutputStringFunc)(const char *);
 

@@ -3,21 +3,21 @@ include $(MAKE_DIR)/*.mk
 STD_SRC_DIR = $(ROOT_DIR)/libs/std
 STD_BIN_DIR = $(BIN_DIR)/$(TARGET)/std
 
-STD_SRC = 	$(STD_SRC_DIR)/alloc.c \
-			$(STD_SRC_DIR)/printer.c \
-			$(STD_SRC_DIR)/printf.c \
-			$(STD_SRC_DIR)/scanner.c
-STD_H =		$(STD_SRC_DIR)/alloc.h \
-			$(STD_SRC_DIR)/log.h \
-			$(STD_SRC_DIR)/printer.h \
-			$(STD_SRC_DIR)/printf.h \
-			$(STD_SRC_DIR)/scanner.h \
-			$(STD_SRC_DIR)/std.h
-STD_OBJ = $(patsubst $(STD_SRC_DIR)/%, $(STD_BIN_DIR)/%.o, $(STD_SRC))
+STD_SRC = 	alloc.c \
+			printer.c \
+			printf.c \
+			scanner.c
+STD_H =		alloc.h \
+			log.h \
+			printer.h \
+			printf.h \
+			scanner.h \
+			std.h
+STD_OBJ = $(patsubst %, $(STD_BIN_DIR)/%.o, $(STD_SRC))
 
 STD_CC = clang
 STD_AR = llvm-ar
-STD_CFLAGS = $(CFLAGS) -target $(TARGET) -std=c11 -I$(ROOT_DIR)/libs
+STD_CFLAGS = $(CFLAGS) -target $(TARGET) -std=c11 -I$(ROOT_DIR)/libs -D__LIB__='"STDLIB"'
 
 STD_LIB = $(BIN_DIR)/$(TARGET)/libstd.a
 
@@ -28,7 +28,7 @@ $(STD_LIB): $(STD_OBJ)
 	$(MKCWD)
 	$(STD_AR) rcs $@ $^
 
-$(STD_BIN_DIR)/%.c.o: $(STD_SRC_DIR)/%.c $(STD_H)
+$(STD_BIN_DIR)/%.c.o: %.c $(STD_H)
 	$(MKCWD)
 	$(STD_CC) $(STD_CFLAGS) -c -o $@ $<
 

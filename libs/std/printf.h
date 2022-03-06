@@ -1,5 +1,5 @@
-#ifndef SUNNY_PRINTF_H
-#define SUNNY_PRINTF_H
+#ifndef STD_PRINTF_H
+#define STD_PRINTF_H
 
 void simple_printf(const char *fmt, ...);
 

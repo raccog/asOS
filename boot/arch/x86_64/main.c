@@ -1,130 +1,60 @@
-#include <hw/efi/efi.h>
+#include "efi.h"
+
 #include <hw/mmap.h>
 #include <std/alloc.h>
 #include <std/std.h>
 #include <std/log.h>
 #include <std/printer.h>
 
-EfiChar16 *char16_buf;
+EfiStatus status;
+EfiMemoryMap efi_mmap;
+size_t efi_mmap_size = sizeof(EfiMemoryDescriptor) * 0xff;
 
-// convert char8 string to char16 string
-//
-// returned string should be freed when not in use
-EfiChar16 *char8_to_char16(const char *buf) {
-    const char *tmp_buf = buf;
-    size_t count = 0;
-
-    // count characters in string
-    do {
-        ++count;
-    } while (*(buf++) != '\0');
-    buf = tmp_buf;
-
-    // copy characters to char16 string
-    for (size_t i = 0; i < count; ++i) {
-        char16_buf[i] = (EfiChar16)buf[i];
-    }
-
-    return char16_buf;
-}
-
-// EFI output string wrapper
-void output_string(const char *str) {
-    EfiChar16 *buf16 = char8_to_char16(str);
-
-    efi_print_str16(buf16);
-    alloc().free((u8 *)buf16);
-}
-
-// needed for EFI application?
-void __chkstk(void) {
-    return;
-}
-
-// returns a string describing an efi memory type
-const char *mmap_kind(SunnyMemoryMapKind kind) {
-    switch (kind) {
-        case SunnyReserved:
-            return "Reserved";
-        case SunnyFree:
-            return "Free";
-        case SunnyReclaimable:
-            return "Reclaimable";
-        case SunnyLoader:
-            return "Loader";
-        case SunnyKernel:
-            return "Kernel";
-        default:
-            return "Unknown";
-    }
-}
-
-// print each entry of the memory map
-void output_mmap(SunnyMemoryMap *mmap) {
-    SunnyMemoryMapDescriptor *largest_free_descriptor = 0;
-    size_t total_free = 0;
-
-    // print memory map details
-    simple_log("Descriptor entries: %i", mmap->entries);
-    simple_log("Physical Start - Physical End | ID | Kind");
-
-    // print each memory map descriptor
-    for (int i = 0; i < mmap->entries; ++i) {
-        SunnyMemoryMapDescriptor *descriptor = mmap->descriptors + i * sizeof(SunnyMemoryMapDescriptor);
-        const char *kind_buf = mmap_kind(descriptor->kind);
-        simple_log("%x-%x: %i %s", descriptor->start, descriptor->start + descriptor->size, i, kind_buf);
-    }
-
-    // get the total amount of free memory and the largest section of free memory
-    for (int i = 0; i < mmap->entries; ++i) {
-        SunnyMemoryMapDescriptor *descriptor = mmap->descriptors + i * sizeof(SunnyMemoryMapDescriptor);
-        if (descriptor->kind == SunnyFree) {
-            total_free += descriptor->size;
-            if (largest_free_descriptor == 0 || descriptor->size > largest_free_descriptor->size) {
-                largest_free_descriptor = descriptor;
-            }
-        }
-    }
-
-    // print out total free memory and largest free section
-    const char *kind_buf = mmap_kind(largest_free_descriptor->kind);
-    simple_log("Largest free: %x-%x, Size: %iMB", largest_free_descriptor->start, largest_free_descriptor->start + largest_free_descriptor->size, largest_free_descriptor->size >> 20);
-    simple_log("Total free: %iMB", total_free >> 20);
-}
-
-EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
+EfiStatus init(EfiSystemTable *st) {
     Printer printer;
-    EfiStatus status;
-    EfiMemoryMap efi_mmap;
-    SunnyMemoryMap sunny_mmap;
+    EfiChar16 *char16_buf;
 
     // stack allocated print buffers
     char stack_print_buffer[256];
     EfiChar16 stack_char16_buf[512];
 
     // init printer
-    printer.output_string = &output_string;
+    printer.output_string = &efi_output_string;
     init_printer(printer);
 
     // temporarily allocate print buffers using the stack
     set_print_buffer(&stack_print_buffer[0]);
-    char16_buf = &stack_char16_buf[0];
+    efi_set_char16_buf(&stack_char16_buf[0]);
 
     // init EFI system table
     if ((status = efi_init(st)) != EFI_SUCCESS) {
         return status;
     }
 
-    // disable watchdog timer
-    st->boot_services->set_watchdog_timer(0, 0, 0, 0);
-
     // allocate buffers
     char *print_buffer;
     alloc().alloc((u8 **)&print_buffer, 1024);
     set_print_buffer(print_buffer);
     alloc().alloc((u8 **)&char16_buf, 2048);
-    size_t efi_mmap_size = sizeof(EfiMemoryDescriptor) * 0xff;
+    efi_set_char16_buf(char16_buf);
     alloc().alloc((u8 **)&efi_mmap.descriptors, efi_mmap_size);
+
+    st->console_out->clear_screen(st->console_out);
+    simple_log("Bootloader init successful");
+
+    return EFI_SUCCESS;
+}
+
+EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
+    OSMemoryMap os_mmap;
+
+    // init efi and allocate printer buffer
+    if ((status = init(st)) != EFI_SUCCESS) {
+        return status;
+    }
+
+    // disable watchdog timer
+    st->boot_services->set_watchdog_timer(0, 0, 0, 0);
 
     // get memory map
     status = st->boot_services->get_memory_map(&efi_mmap_size, efi_mmap.descriptors, &efi_mmap.key, &efi_mmap.descriptor_size, &efi_mmap.version);
@@ -134,9 +64,8 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     }
 
     // output memory map
-    st->console_out->clear_screen(st->console_out);
-    to_sunny_mmap(&efi_mmap, &sunny_mmap);
-    output_mmap(&sunny_mmap);
+    to_os_mmap(&efi_mmap, &os_mmap);
+    output_mmap(&os_mmap);
 
     // test log function
     simple_log("Hello kernel!");
