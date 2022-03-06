@@ -8,10 +8,10 @@ MAKE_VARS = ROOT_DIR='$(ROOT_DIR)' \
 
 CFLAGS = -ffreestanding -mno-red-zone
 
-BOOT_X64_SRC_DIR = $(ROOT_DIR)/boot/arch/x86_64
+BOOT_X64_SRC_DIR = $(ROOT_DIR)/boot/efi
 BOOT_X64_BIN_DIR = $(BIN_DIR)/$(TARGET)/boot
 
-BOOT_X64_SRC = 	main.c \
+BOOT_X64_SRC = 	entry.c \
 				efi.c
 BOOT_X64_OBJ = $(patsubst %, $(BOOT_X64_BIN_DIR)/%.o, $(BOOT_X64_SRC))
 OVMF_SRC = $(CACHE_DIR)/OVMF.fd

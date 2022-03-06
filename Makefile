@@ -20,9 +20,9 @@ nuke:
 .PHONY: nuke
 
 bootloader:
-	$(MAKE_VARS) $(MAKE) -C boot/arch/x86_64
+	$(MAKE_VARS) $(MAKE) -C boot/efi
 .PHONY: bootloader
 
 run:
-	$(MAKE_VARS) $(MAKE) -C boot/arch/x86_64 run
+	$(MAKE_VARS) $(MAKE) -C boot/efi run
 .PHONY: run
