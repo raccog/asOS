@@ -47,24 +47,20 @@ EfiChar16 *char8_to_char16(const char *buf) {
     return char16_buf;
 }
 
+EfiStatus efi_print_str16(EfiChar16 *str) {
+    EfiStatus status = system_table->console_out->output_string(system_table->console_out, str);
+    if (status != EFI_SUCCESS) {
+        return status;
+    }
+
+    return EFI_SUCCESS;
+}
+
 void efi_output_string(const char *str) {
     EfiChar16 *buf16 = char8_to_char16(str);
 
     efi_print_str16(buf16);
     alloc().free((u8 *)buf16);
-}
-
-EfiStatus efi_init(EfiSystemTable *st) {
-    // set global system table
-    system_table = st;
-
-    // set efi allocator functions
-    efi_allocator.alloc = &efi_alloc;
-    efi_allocator.free = &efi_free;
-    init_alloc(efi_allocator);
-
-    // allocate pages for efi buffer
-    return efi_page_alloc((EfiPhysicalAddress *)&efi_buffer, 8, AllocateAnyPages); // 8 pages
 }
 
 EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages, EfiAllocateType alloc_type) {
@@ -87,13 +83,17 @@ EfiStatus efi_page_free(EfiPhysicalAddress buf) {
     return EFI_SUCCESS;
 }
 
-EfiStatus efi_print_str16(EfiChar16 *str) {
-    EfiStatus status = system_table->console_out->output_string(system_table->console_out, str);
-    if (status != EFI_SUCCESS) {
-        return status;
-    }
+EfiStatus efi_init(EfiSystemTable *st) {
+    // set global system table
+    system_table = st;
 
-    return EFI_SUCCESS;
+    // set efi allocator functions
+    efi_allocator.alloc = &efi_alloc;
+    efi_allocator.free = &efi_free;
+    init_alloc(efi_allocator);
+
+    // allocate pages for efi buffer
+    return efi_page_alloc((EfiPhysicalAddress *)&efi_buffer, 8, AllocateAnyPages); // 8 pages
 }
 
 // needed for EFI application?

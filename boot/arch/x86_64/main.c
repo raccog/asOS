@@ -13,6 +13,7 @@ size_t efi_mmap_size = sizeof(EfiMemoryDescriptor) * 0xff;
 EfiStatus init(EfiSystemTable *st) {
     Printer printer;
     EfiChar16 *char16_buf;
+    char *print_buffer;
 
     // stack allocated print buffers
     char stack_print_buffer[256];
@@ -32,14 +33,12 @@ EfiStatus init(EfiSystemTable *st) {
     }
 
     // allocate buffers
-    char *print_buffer;
     alloc().alloc((u8 **)&print_buffer, 1024);
     set_print_buffer(print_buffer);
     alloc().alloc((u8 **)&char16_buf, 2048);
     efi_set_char16_buf(char16_buf);
     alloc().alloc((u8 **)&efi_mmap.descriptors, efi_mmap_size);
 
-    st->console_out->clear_screen(st->console_out);
     simple_log("Bootloader init successful");
 
     return EFI_SUCCESS;
