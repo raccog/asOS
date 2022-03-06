@@ -3,6 +3,8 @@
 #include <std/alloc.h>
 #include <std/log.h>
 
+#define BOOTLOADER_PAGES 8
+
 // global system table
 EfiSystemTable *system_table;
 
@@ -11,8 +13,14 @@ EfiChar16 *char16_buf;
 // efi allocator functions
 u8 *efi_buffer;
 Allocator efi_allocator;
+u64 allocated_bytes;
 
 bool efi_alloc(u8 **ptr, size_t bytes) {
+    if (allocated_bytes + bytes > (BOOTLOADER_PAGES << 22)) {
+        simple_log("CRITICAL ERROR: Heap overflow in bootloader");
+        return false;
+    }
+    allocated_bytes += bytes;
     *ptr = efi_buffer;
     efi_buffer += bytes;
     return true;
@@ -91,9 +99,10 @@ EfiStatus efi_init(EfiSystemTable *st) {
     efi_allocator.alloc = &efi_alloc;
     efi_allocator.free = &efi_free;
     init_alloc(efi_allocator);
+    allocated_bytes = 0;
 
     // allocate pages for efi buffer
-    return efi_page_alloc((EfiPhysicalAddress *)&efi_buffer, 8, AllocateAnyPages); // 8 pages
+    return efi_page_alloc((EfiPhysicalAddress *)&efi_buffer, BOOTLOADER_PAGES, AllocateAnyPages); // 8 pages
 }
 
 // needed for EFI application?
