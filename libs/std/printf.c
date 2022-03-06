@@ -7,6 +7,7 @@
 // print buffer
 char *print_buffer;
 
+// print a 32bit unsigned integer as hexadecimal
 void print_hex(Scanner *scanner, int value) {
     scanner_put_char(scanner, '0');
     scanner_put_char(scanner, 'x');
@@ -21,6 +22,7 @@ void print_hex(Scanner *scanner, int value) {
     }
 }
 
+// print a 64bit address pointer
 void print_ptr(Scanner *scanner, long value) {
     scanner_put_char(scanner, '0');
     scanner_put_char(scanner, 'x');
@@ -35,6 +37,7 @@ void print_ptr(Scanner *scanner, long value) {
     }
 }
 
+// print a 32bit signed integer
 void print_int(Scanner *scanner, int value) {
     size_t digits = 1;
     int divisor;
@@ -58,6 +61,7 @@ void print_int(Scanner *scanner, int value) {
     }
 }
 
+// print a null-terminated string
 void print_str(Scanner *scanner, const char *str) {
     while (*str != '\0') {
         scanner_put_char(scanner, *str);
@@ -65,6 +69,7 @@ void print_str(Scanner *scanner, const char *str) {
     }
 }
 
+// print a 32bit unsigned integer as a bit string
 void print_bits(Scanner *scanner, int value) {
     char c;
 
@@ -98,6 +103,7 @@ void simple_printf(const char *fmt, ...) {
 
     while ((c = scanner_next_char(&scanner)) != '\0') {
         if (c == '%') {
+            // format an argument
             c = scanner_next_char(&scanner);
             switch (c) {
                 case 'x':
@@ -124,13 +130,16 @@ void simple_printf(const char *fmt, ...) {
                     scanner_put_char(&scanner, c);
             }
         } else if (c == '\n') {
+            // output a new line
             scanner_put_char(&scanner, '\r');
             scanner_put_char(&scanner, '\n');
         } else {
+            // output a non-formatted character
             scanner_put_char(&scanner, c);
         }
     }
 
+    // null-terminate string
     scanner_put_char(&scanner, '\0');
 
     // output string and free buffer

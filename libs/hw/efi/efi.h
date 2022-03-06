@@ -10,6 +10,10 @@
 
 #include <std/std.h>
 
+// EFIAPI is defined just to follow calling conventions,
+// it is not needed for compilation.
+#define EFIAPI
+
 #define EFI_SUCCESS             0
 #define EFI_ERROR               (1ull << 63)
 #define EFI_LOAD_ERROR          (1  | EFI_ERROR)
@@ -187,5 +191,7 @@ typedef struct {
 	u32 num_table_entries;
 	u64 config_table;  // config table pointer
 } EfiSystemTable;
+
+typedef EfiStatus (EFIAPI *EfiImageEntryPoint)(EfiHandle handle, EfiSystemTable *st);
 
 #endif

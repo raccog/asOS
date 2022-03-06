@@ -1,8 +1,10 @@
 #include <std/scanner.h>
 
 void scanner_init(Scanner *scanner) {
+    // set buffers to null
     scanner->in_buf = 0;
     scanner->out_buf = 0;
+    // set counters to zero
     scanner->in_idx = 0;
     scanner->out_idx = 0;
 }

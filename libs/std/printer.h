@@ -3,15 +3,15 @@
 
 typedef void (*OutputStringFunc)(const char *);
 
-// printer contains function pointer to print a string
+// Printer contains function pointer to print a string
 typedef struct {
     OutputStringFunc output_string;
 } Printer;
 
-// get global printer
+// Get global printer
 Printer printer();
 
-// set global printer
+// Set global printer
 void init_printer(Printer printer);
 
 #endif

@@ -6,16 +6,16 @@
 typedef bool (*AllocateFunc)(u8 **ptr, size_t bytes);
 typedef void (*FreeFunc)(u8 *ptr);
 
-// allocator contains function pointers to dynamically allocate and free memory
+// Allocator contains function pointers to dynamically allocate and free heap memory
 typedef struct {
     AllocateFunc alloc;
     FreeFunc free;
 } Allocator;
 
-// get global allocator
+// Get global allocator
 Allocator alloc();
 
-// init global allocator
+// Set global allocator
 void init_alloc(Allocator allocator);
 
 #endif
