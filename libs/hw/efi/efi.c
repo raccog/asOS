@@ -1,7 +1,6 @@
-#include <efi/efi.h>
+#include <hw/efi/efi.h>
 
 #include <std/alloc.h>
-#include <std/io.h>
 #include <std/log.h>
 
 // global system table

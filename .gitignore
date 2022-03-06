@@ -4,5 +4,6 @@
 *.o
 *tags
 
+.vscode/
 Build/
 Toolchain/

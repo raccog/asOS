@@ -1,7 +1,5 @@
-#ifndef STD_IO_H
-#define STD_IO_H
-
-#include <std/bool.h>
+#ifndef SUNNY_PRINTER_H
+#define SUNNY_PRINTER_H
 
 typedef void (*OutputStringFunc)(const char *);
 
@@ -15,11 +13,5 @@ Printer printer();
 
 // set global printer
 void init_printer(Printer printer);
-
-// sets printer function pointers to null
-void disable_printer();
-
-// returns true if the printer function pointers are null
-bool printer_is_disabled();
 
 #endif

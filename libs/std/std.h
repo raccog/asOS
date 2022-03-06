@@ -1,6 +1,9 @@
-#ifndef STD_INT_H
-#define STD_INT_H
+#ifndef STD_STD_H
+#define STD_STD_H
 
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 typedef intmax_t imax;

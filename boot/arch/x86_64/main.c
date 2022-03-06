@@ -1,12 +1,9 @@
-#include <efi/efi.h>
+#include <hw/efi/efi.h>
+#include <hw/mmap.h>
 #include <std/alloc.h>
-#include <std/int.h>
-#include <std/io.h>
+#include <std/std.h>
 #include <std/log.h>
-#include <sunny/mmap.h>
-
-// stack allocated buffer
-EfiChar16 stack_char16_buf[512];
+#include <std/printer.h>
 
 EfiChar16 *char16_buf;
 
@@ -101,12 +98,16 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     EfiMemoryMap efi_mmap;
     SunnyMemoryMap sunny_mmap;
 
+    // stack allocated print buffers
+    char stack_print_buffer[256];
+    EfiChar16 stack_char16_buf[512];
+
     // init printer
     printer.output_string = &output_string;
     init_printer(printer);
 
     // temporarily allocate print buffers using the stack
-    stack_alloc_print_buffer();
+    set_print_buffer(&stack_print_buffer[0]);
     char16_buf = &stack_char16_buf[0];
 
     // init EFI system table
@@ -118,7 +119,9 @@ EfiStatus efi_main(EfiHandle handle, EfiSystemTable *st) {
     st->boot_services->set_watchdog_timer(0, 0, 0, 0);
 
     // allocate buffers
-    alloc_print_buffer();
+    char *print_buffer;
+    alloc().alloc((u8 **)&print_buffer, 1024);
+    set_print_buffer(print_buffer);
     alloc().alloc((u8 **)&char16_buf, 2048);
     size_t efi_mmap_size = sizeof(EfiMemoryDescriptor) * 0xff;
     alloc().alloc((u8 **)&efi_mmap.descriptors, efi_mmap_size);

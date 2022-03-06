@@ -8,8 +8,7 @@
 #ifndef EFI_H
 #define EFI_H
 
-#include <std/bool.h>
-#include <std/int.h>
+#include <std/std.h>
 
 #define EFI_SUCCESS             0
 #define EFI_ERROR               (1ull << 63)

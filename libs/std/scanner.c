@@ -1,4 +1,4 @@
-#include <std/log/scanner.h>
+#include <std/scanner.h>
 
 void scanner_init(Scanner *scanner) {
     scanner->in_buf = 0;

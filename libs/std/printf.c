@@ -1,11 +1,8 @@
 #include <std/alloc.h>
-#include <std/arg.h>
-#include <std/int.h>
-#include <std/io.h>
-#include <std/log.h>
-
-// stack allocated print buffer
-char stack_print_buffer[256];
+#include <std/scanner.h>
+#include <std/printer.h>
+#include <std/printf.h>
+#include <std/std.h>
 
 // print buffer
 char *print_buffer;
@@ -143,11 +140,7 @@ void simple_printf(const char *fmt, ...) {
     va_end(args);
 }
 
-void alloc_print_buffer() {
-    // allocate char buffer
-    alloc().alloc((u8 **)&print_buffer, 1024);
+void set_print_buffer(char *buf) {
+    print_buffer = buf;
 }
 
-void stack_alloc_print_buffer() {
-    print_buffer = &stack_print_buffer[0];
-}

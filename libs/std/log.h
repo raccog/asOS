@@ -1,17 +1,10 @@
-#ifndef STD_LOG_H
-#define STD_LOG_H
+#ifndef SUNNY_LOG_H
+#define SUNNY_LOG_H
 
-#include <std/log/scanner.h>
+#include <std/scanner.h>
+#include <std/printf.h>
 
 #define simple_log(fmt, ...) \
-    simple_printf("[%s:%i] " fmt "\n", __FILE__, __LINE__, __VA_ARGS__)
-
-void simple_printf(const char *fmt, ...);
-
-// allocates print buffer using dynamic allocator
-void alloc_print_buffer();
-
-// allocates print buffer using stack
-void stack_alloc_print_buffer();
+    simple_printf("[%s:%i] " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
 #endif

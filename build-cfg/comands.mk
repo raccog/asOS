@@ -1,0 +1,1 @@
+MKCWD = mkdir -p $(@D)

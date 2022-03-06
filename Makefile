@@ -1,31 +1,29 @@
-# Makefile structure is inspired by brutal
-# https://github.com/brutal-org/brutal
-.SUFFIXES:
-.DELETE_ON_ERROR:
-.DEFAULT_GOAL := all
+# Paths and commands used in all makefiles
+ROOT_DIR = $(shell pwd)
+MAKE_DIR = $(ROOT_DIR)/build-cfg
 
-CC := clang
-LD := clang
-CFLAGS := -O2
-
-BUILD_DIR := build
-CACHE_DIR := $(BUILD_DIR)/cache
-
-MKCWD = mkdir -p $(@D)
+# List of variables to pass to sub-makefiles
+MAKE_VARS = ROOT_DIR='$(ROOT_DIR)' \
+			MAKE_DIR='$(MAKE_DIR)'
 
 # Libs
-include libs/std/.build.mk
-include libs/efi/.build.mk
+#include libs/std/.build.mk
+#include libs/efi/.build.mk
 
 # Kernel lib
-include libs/sunny/.build.mk
+#include libs/sunny/.build.mk
 
 # Bootloader
-include boot/arch/x86_64/.build.mk
+#include boot/arch/x86_64/.build.mk
 
+all: bootloader
+#	$(MAKE_VARS) make -C libs
 .PHONY: all
-all: $(ALL)
 
-.PHONY: clean
 clean: 
 	rm -rf $(BUILD_DIR)
+.PHONY: clean
+
+bootloader:
+	$(MAKE_VARS) $(MAKE) -C boot/arch/x86_64
+.PHONY: bootloader

@@ -1,8 +1,8 @@
 #ifndef SUNNY_MMAP_H
 #define SUNNY_MMAP_H
 
-#include <efi/efi.h>
-#include <std/int.h>
+#include <hw/efi/efi.h>
+#include <std/std.h>
 
 typedef u64 SunnyMemoryAddress;
 
