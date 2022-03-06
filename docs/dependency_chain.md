@@ -4,7 +4,7 @@ This document describes each executable that is created during the build process
 
 ## Executables and Libraries
 
-An executable describes a binary file (currently in the ELF format) that will be loaded either by the OS or a part of the bootloader.
+An executable describes a binary file that will be loaded either by the OS or a part of the bootloader.
 
 Common libraries describe object archive files that have not been linked yet.
 These libraries are to be statically included in executables that depend on them.
@@ -18,15 +18,15 @@ Thus, the kernel and bootloader both need to be linked to the Stdlib and a file 
 
 ### Bootloader
 
-Currently, the only supported option is UEFI, but other options such as raspberry pis may be supported in the future.
+Currently, the only supported option is UEFI on x86_64 systems, but other options such as raspberry pis may be supported in the future.
 
-Every library and executable listed under the bootloader will be removed from memory when the kernel is finished loading.
+Every library and executable listed under the bootloader will be freed from memory when the kernel is finished loading.
 
 Dependencies:
 
 * Archlib
 * Stdlib
-* EFIlib (in hardwarelib)
+* Hardwarelib
 * Bootlib
 
 ### Kernel
@@ -39,7 +39,7 @@ Dependencies:
 
 * Archlib
 * Stdlib
-* EFIlib (in hardwarelib)
+* Hardwarelib
 * Kernellib
 
 ### Userspace Programs
