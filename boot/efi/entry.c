@@ -32,7 +32,7 @@ EfiStatus init(EfiSystemTable *st) {
     efi_set_char16_buf(&efi_stack_print_buf[0]);
 
     // init EFI system table
-    if ((status = efi_init(st)) != EFI_SUCCESS) {
+    if ((status = efi_init(st)) != EfiSuccess) {
         return status;
     }
 
@@ -49,7 +49,7 @@ EfiStatus init(EfiSystemTable *st) {
 
     simple_log("Bootloader init successful");
 
-    return EFI_SUCCESS;
+    return EfiSuccess;
 }
 
 // The main entry point for the UEFI bootloader.
@@ -58,7 +58,7 @@ EfiStatus EFIAPI efi_main(EfiHandle handle, EfiSystemTable *st) {
     OSMemoryMap os_mmap;
 
     // init efi and allocate printer buffers
-    if ((status = init(st)) != EFI_SUCCESS) {
+    if ((status = init(st)) != EfiSuccess) {
         return status;
     }
 
@@ -69,7 +69,7 @@ EfiStatus EFIAPI efi_main(EfiHandle handle, EfiSystemTable *st) {
     // get efi memory map
     status = st->boot_services->get_memory_map(&efi_mmap_size, efi_mmap.descriptors, &efi_mmap.key, &efi_mmap.descriptor_size, &efi_mmap.version);
     efi_mmap.entries = efi_mmap_size / efi_mmap.descriptor_size;
-    if (status != EFI_SUCCESS) {
+    if (status != EfiSuccess) {
         return status;
     }
 
@@ -87,6 +87,6 @@ EfiStatus EFIAPI efi_main(EfiHandle handle, EfiSystemTable *st) {
     efi_exit();
 
     // bootloader should never return
-    return EFI_LOAD_ERROR;
+    return EfiLoadError;
 
 }

@@ -97,23 +97,23 @@ void efi_output_string(const char *str) {
 // Uses UEFI page allocator to allocate a number of pages.
 EfiStatus efi_page_alloc(EfiPhysicalAddress *buf, size_t num_pages, EfiAllocateType alloc_type) {
     EfiStatus status = system_table->boot_services->allocate_pages(alloc_type, EfiLoaderData, num_pages, buf);
-    if (status != EFI_SUCCESS) {
+    if (status != EfiSuccess) {
         simple_log("Error during UEFI page allocation. Code: %i", status);
         return status;
     }
 
-    return EFI_SUCCESS;
+    return EfiSuccess;
 }
 
 // Uses UEFI page allocator free to free pages.
 EfiStatus efi_page_free(EfiPhysicalAddress buf, size_t num_pages) {
     EfiStatus status = system_table->boot_services->free_pages(buf, num_pages);
-    if (status != EFI_SUCCESS) {
+    if (status != EfiSuccess) {
         simple_log("Error during UEFI page free. Code: %i", status);
         return status;
     }
 
-    return EFI_SUCCESS;
+    return EfiSuccess;
 }
 
 EfiStatus efi_init(EfiSystemTable *st) {
@@ -129,14 +129,14 @@ EfiStatus efi_init(EfiSystemTable *st) {
     allocated_bytes = 0;
 
     // allocate pages for efi buffer
-    if ((status = efi_page_alloc((EfiPhysicalAddress *)&efi_heap_buffer, BOOTLOADER_PAGES, AllocateAnyPages)) != EFI_SUCCESS) {
+    if ((status = efi_page_alloc((EfiPhysicalAddress *)&efi_heap_buffer, BOOTLOADER_PAGES, AllocateAnyPages)) != EfiSuccess) {
         return status;
     }
 
     // save page buffer starting address to free later
     efi_heap_buffer_start = efi_heap_buffer;
 
-    return EFI_SUCCESS;
+    return EfiSuccess;
 }
 
 EfiStatus efi_exit() {
