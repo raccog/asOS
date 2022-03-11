@@ -1,7 +1,7 @@
 #include <std/printer.h>
 
 // memory for global printer
-Printer _printer;
+static Printer _printer;
 
 Printer printer() {
     return _printer;

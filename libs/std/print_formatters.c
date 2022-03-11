@@ -21,16 +21,16 @@ typedef enum {
     Bits64
 } ValueBits;
 
-void print_zero() {
+static void print_zero() {
     printer().putc('0');
     printer().putc('\n');   // TODO: remove this line; just for testing
 }
 
-void print_negative_sign() {
+static void print_negative_sign() {
     printer().putc('-');
 }
 
-void print_digits(u64 value, ValueBits bits, size_t buf_size) {
+static void print_digits(u64 value, ValueBits bits, size_t buf_size) {
     // Buffer that contains the final string representation
     char buf[buf_size];
     size_t buf_idx = 0;
@@ -86,7 +86,7 @@ void print_digits(u64 value, ValueBits bits, size_t buf_size) {
     printer().putc('\n');   // TODO: remove this line; just for testing
 }
 
-void print_number_unsigned(u64 value, ValueBits bits, size_t buf_size) {
+static void print_number_unsigned(u64 value, ValueBits bits, size_t buf_size) {
     // If value is zero, print and return
     if (value == 0) {
         print_zero();
@@ -96,7 +96,7 @@ void print_number_unsigned(u64 value, ValueBits bits, size_t buf_size) {
     print_digits(value, bits, buf_size);
 }
 
-void print_number_signed(i64 value, ValueBits bits, size_t buf_size) {
+static void print_number_signed(i64 value, ValueBits bits, size_t buf_size) {
     // If value is zero, print and return
     if (value == 0) {
         print_zero();

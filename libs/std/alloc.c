@@ -1,7 +1,7 @@
 #include <std/alloc.h>
 
 // memory for global allocator
-Allocator _allocator;
+static Allocator _allocator;
 
 Allocator alloc() {
     return _allocator;

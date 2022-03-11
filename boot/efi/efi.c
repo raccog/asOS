@@ -5,16 +5,16 @@
 #define BOOTLOADER_PAGES 8
 
 // global system table
-EfiSystemTable *system_table;
+static EfiSystemTable *system_table;
 
 // buffer to use for heap allocation
-u8 *efi_heap_buffer_start;
-u8 *efi_heap_buffer;
-u64 allocated_bytes;    // counter used to panic when heap has overflowed
+static u8 *efi_heap_buffer_start;
+static u8 *efi_heap_buffer;
+static u64 allocated_bytes;    // counter used to panic when heap has overflowed
 
 // This allocator contains pointers to efi allocation functions.
 // These allocation functions are to be used only in the UEFI bootloader
-Allocator efi_allocator;
+static Allocator efi_allocator;
 
 // The most simple heap allocation function.
 //

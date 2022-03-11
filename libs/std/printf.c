@@ -4,10 +4,10 @@
 #include <std/printf.h>
 
 // print buffer
-char *print_buffer;
+static char *print_buffer;
 
 // print a 32bit unsigned integer as hexadecimal
-void print_hex(Scanner *scanner, int value) {
+static void print_hex(Scanner *scanner, int value) {
     scanner_put_char(scanner, '0');
     scanner_put_char(scanner, 'x');
 
@@ -22,7 +22,7 @@ void print_hex(Scanner *scanner, int value) {
 }
 
 // print a 64bit address pointer
-void print_ptr(Scanner *scanner, long value) {
+static void print_ptr(Scanner *scanner, long value) {
     scanner_put_char(scanner, '0');
     scanner_put_char(scanner, 'x');
 
@@ -37,7 +37,7 @@ void print_ptr(Scanner *scanner, long value) {
 }
 
 // print a 32bit signed integer
-void print_int(Scanner *scanner, int value) {
+static void print_int(Scanner *scanner, int value) {
     size_t digits = 1;
     int divisor;
 
@@ -61,7 +61,7 @@ void print_int(Scanner *scanner, int value) {
 }
 
 // print a null-terminated string
-void print_str(Scanner *scanner, const char *str) {
+static void print_str(Scanner *scanner, const char *str) {
     while (*str != '\0') {
         scanner_put_char(scanner, *str);
         ++str;
@@ -69,7 +69,7 @@ void print_str(Scanner *scanner, const char *str) {
 }
 
 // print a 32bit unsigned integer as a bit string
-void print_bits(Scanner *scanner, int value) {
+static void print_bits(Scanner *scanner, int value) {
     char c;
 
     scanner_put_char(scanner, '0');
@@ -89,7 +89,7 @@ void print_bits(Scanner *scanner, int value) {
     }
 }
 
-void simple_printf(const char *fmt, ...) {
+static void simple_printf(const char *fmt, ...) {
     va_list args;
     Scanner scanner;
     char c;
@@ -148,7 +148,7 @@ void simple_printf(const char *fmt, ...) {
     va_end(args);
 }
 
-void set_print_buffer(char *buf) {
+static void set_print_buffer(char *buf) {
     print_buffer = buf;
 }
 
