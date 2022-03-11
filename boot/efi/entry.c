@@ -144,6 +144,20 @@ EfiStatus EfiApi efi_main(EfiHandle image_handle, EfiSystemTable *st) {
     print_long_unsigned$(18446744073709551615ul);
     simple_log("print_long_unsigned$() test complete.");
 
+    simple_log("Testing function print_hex32$() ...");
+    puts("Should be 0xdeadbeef: ");
+    print_hex32$(0xdeadbeef);
+    puts("Should be 0x0000000a: ");
+    print_hex32$(0x0000000a);
+    simple_log("print_hex32$() test complete.");
+
+    simple_log("Testing function print_hex64$() ...");
+    puts("Should be 0x00000000deadbeef: ");
+    print_hex64$(0xdeadbeef);
+    puts("Should be 0x0123456789abcdef: ");
+    print_hex64$(0x0123456789abcdef);
+    simple_log("print_hex64$() test complete.");
+
     // infinite loop will be replaced with calling the OS entry point
     while (true) {}
 

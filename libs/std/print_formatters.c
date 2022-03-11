@@ -110,6 +110,53 @@ static void print_number_signed(i64 value, ValueBits bits, size_t buf_size) {
     print_digits((u64)value, bits, buf_size);
 }
 
+static void print_hex(u64 value, ValueBits bits) {
+    // Print out hex prefix
+    printer().putc('0');
+    printer().putc('x');
+
+    // Decide how many hex digits to print
+    int digits;
+    switch (bits) {
+        case Bits8:
+            digits = 2;
+            break;
+        case Bits16:
+            digits = 4;
+            break;
+        case Bits32:
+            digits = 8;
+            break;
+        case Bits64:
+            digits = 16;
+            break;
+        default:
+            simple_log("Bits (%i) is not valid", bits);
+            return;
+    }
+
+    // Buffer that contains the final string representation
+    char buf[digits + 1];
+    size_t buf_idx = 0;
+
+    // Print out each hex digit
+    for (int i = digits - 1; i >= 0; --i) {
+        u8 hex_val = (value >> (i * 4)) & 0xf;
+        if (hex_val < 0xa) {
+            buf[buf_idx++] = '9' - (9 - hex_val);
+        } else {
+            buf[buf_idx++] = 'f' - (0xf - hex_val);
+        }
+    }
+
+    // add null terminator
+    buf[buf_idx] = '\0';
+
+    // print to screen
+    printer().puts(buf);
+    printer().putc('\n');   // TODO: remove this line; just for testing
+}
+
 void print_int$(i32 value) {
     print_number_signed(value, Bits32, IntBufferSize);
 }
@@ -124,4 +171,12 @@ void print_int_unsigned$(u32 value) {
 
 void print_long_unsigned$(u64 value) {
     print_number_unsigned(value, Bits64, LongBufferSize);
+}
+
+void print_hex32$(u32 value) {
+    print_hex(value, Bits32);
+}
+
+void print_hex64$(u64 value) {
+    print_hex(value, Bits64);
 }
