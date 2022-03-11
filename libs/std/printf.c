@@ -1,6 +1,7 @@
 #include <std/alloc.h>
 #include <std/scanner.h>
 #include <std/printer.h>
+#include <std/print_formatters.h>
 #include <std/printf.h>
 
 // print buffer
@@ -89,7 +90,7 @@ static void print_bits(Scanner *scanner, int value) {
     }
 }
 
-static void simple_printf(const char *fmt, ...) {
+void simple_printf(const char *fmt, ...) {
     va_list args;
     Scanner scanner;
     char c;
@@ -144,6 +145,64 @@ static void simple_printf(const char *fmt, ...) {
     // output string and free buffer
     printer().puts(scanner.out_buf);
     alloc().free((u8 *)scanner.out_buf);
+
+    va_end(args);
+}
+
+void simple_printf$(const char *fmt, ...) {
+    va_list args;
+    char c;
+
+    va_start(args, fmt);
+
+    while ((c = *fmt++) != '\0') {
+        if (c == '%') {
+            c = *fmt++;
+            switch (c) {
+                case 'c':
+                    printer().putc((char)va_arg(args, i32));
+                    break;
+                case 'i':
+                case 'd':
+                    if (*fmt == 'l') {
+                        ++fmt;
+                        print_long$(va_arg(args, i64));
+                    } else {
+                        print_int$(va_arg(args, i32));
+                    }
+                    break;
+                case 's':
+                    printer().puts(va_arg(args, const char *));
+                    break;
+                case 'u':
+                    if (*fmt == 'l') {
+                        ++fmt;
+                        print_long_unsigned$(va_arg(args, u64));
+                    } else {
+                        print_int_unsigned$(va_arg(args, u32));
+                    }
+                    break;
+                case 'x':
+                    if (*fmt == 'l') {
+                        ++fmt;
+                        print_hex64$(va_arg(args, u64));
+                    } else {
+                        print_hex32$(va_arg(args, u32));
+                    }
+                    break;
+                case 'p':
+                    print_hex64$((u64)va_arg(args, void *));
+                    break;
+                case '%':
+                default:
+                    printer().putc(c);
+            }
+        } else {
+            printer().putc(c);
+        }
+    }
+
+    printer().putc('\n');   // TODO: remove this line. just for testing
 
     va_end(args);
 }

@@ -158,6 +158,17 @@ EfiStatus EfiApi efi_main(EfiHandle image_handle, EfiSystemTable *st) {
     print_hex64$(0x0123456789abcdef);
     simple_log("print_hex64$() test complete.");
 
+    simple_log("Testing simple_printf$() ...");
+    simple_printf$("Should be 0: %i", 0);
+    simple_printf$("Should be 10: %i", 10);
+    simple_printf$("Should be 7: %d", 7);
+    simple_printf$("Should be 5827462: %i", 5827462);
+    simple_printf$("Should be 1234567890: %i", 1234567890);
+    simple_printf$("Should be -1234567890: %i", -1234567890);
+    simple_printf$("Should be 10000000000: %il", 10000000000l);
+    simple_printf$("Should be -12345678901234567: %il", -12345678901234567l);
+    simple_log("simple_printf$() test complete.");
+
     // infinite loop will be replaced with calling the OS entry point
     while (true) {}
 

@@ -23,7 +23,6 @@ typedef enum {
 
 static void print_zero() {
     printer().putc('0');
-    printer().putc('\n');   // TODO: remove this line; just for testing
 }
 
 static void print_negative_sign() {
@@ -83,7 +82,6 @@ static void print_digits(u64 value, ValueBits bits, size_t buf_size) {
 
     // print to screen
     printer().puts(buf);
-    printer().putc('\n');   // TODO: remove this line; just for testing
 }
 
 static void print_number_unsigned(u64 value, ValueBits bits, size_t buf_size) {
@@ -154,7 +152,6 @@ static void print_hex(u64 value, ValueBits bits) {
 
     // print to screen
     printer().puts(buf);
-    printer().putc('\n');   // TODO: remove this line; just for testing
 }
 
 void print_int$(i32 value) {
