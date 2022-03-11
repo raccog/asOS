@@ -53,7 +53,7 @@ EfiStatus init(EfiSystemTable *st) {
 }
 
 // The main entry point for the UEFI bootloader.
-EfiStatus EFIAPI efi_main(EfiHandle handle, EfiSystemTable *st) {
+EfiStatus EfiApi efi_main(EfiHandle image_handle, EfiSystemTable *st) {
     // OS memory map
     OSMemoryMap os_mmap;
 
@@ -79,6 +79,24 @@ EfiStatus EFIAPI efi_main(EfiHandle handle, EfiSystemTable *st) {
 
     // test log function
     simple_log("Hello kernel!");
+
+    // print address of bootloader entry
+    simple_log("Bootloader entry at: %x", &efi_main);
+
+    // setup for getting bootloader image protocol
+    EfiLoadedImageProtocol *loaded_image;
+    EfiGuid guid = EfiLoadedImageProtocolGuid;
+
+    // get image protocol
+    status = st->boot_services->open_protocol(image_handle, &guid, (void **)&loaded_image, image_handle, 0, EfiOpenProtocolGetProtocol);
+    if (status != EfiSuccess) {
+        simple_log("Failed to open loaded image protocol with error code %i", status);
+        return status;
+    }
+
+    // print image information
+    simple_log("Image base: %x", loaded_image->image_base);
+    simple_log("Image size: %x", loaded_image->image_size);
 
     // infinite loop will be replaced with calling the OS entry point
     while (true) {}

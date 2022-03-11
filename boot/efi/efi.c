@@ -141,7 +141,7 @@ EfiStatus efi_init(EfiSystemTable *st) {
 
 EfiStatus efi_exit() {
     // free page buffer
-    efi_page_free(efi_heap_buffer_start, BOOTLOADER_PAGES);
+    return efi_page_free((EfiPhysicalAddress)efi_heap_buffer_start, BOOTLOADER_PAGES);
 }
 
 // needed for EFI application?

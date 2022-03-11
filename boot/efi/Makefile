@@ -1,12 +1,13 @@
 TARGET = x86_64-pc-unknown-windows
+CFLAGS = -ffreestanding -fno-stack-protector -fshort-wchar -mno-red-zone -Wall
 
 include $(MAKE_DIR)/*.mk
 
 # List of variables to pass to sub-makefiles
 MAKE_VARS = ROOT_DIR='$(ROOT_DIR)' \
-			MAKE_DIR='$(MAKE_DIR)'
-
-CFLAGS = -ffreestanding -mno-red-zone
+			MAKE_DIR='$(MAKE_DIR)' \
+			TARGET='$(TARGET)' \
+			CFLAGS='$(CFLAGS)'
 
 BOOT_X64_SRC_DIR = $(ROOT_DIR)/boot/efi
 BOOT_X64_BIN_DIR = $(BIN_DIR)/$(TARGET)/boot
@@ -55,9 +56,9 @@ $(BOOT_X64_BIN_DIR)/%.c.o: %.c
 	$(BOOT_X64_CC) $(BOOT_X64_CFLAGS) -c -o $@ $<
 
 $(STD_LIB):
-	$(MAKE_VARS) TARGET='$(TARGET)' CFLAGS='$(CFLAGS)' $(MAKE) -C $(ROOT_DIR)/libs/std
+	$(MAKE_VARS) $(MAKE) -C $(ROOT_DIR)/libs/std
 .PHONY: $(STD_LIB)
 
 $(HW_LIB):
-	$(MAKE_VARS) TARGET='$(TARGET)' CFLAGS='$(CFLAGS)' $(MAKE) -C $(ROOT_DIR)/libs/hw
+	$(MAKE_VARS) $(MAKE) -C $(ROOT_DIR)/libs/hw
 .PHONY: $(HW_LIB)

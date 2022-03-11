@@ -52,7 +52,6 @@ void output_mmap(OSMemoryMap *mmap) {
     }
 
     // print out total free, reserved, and reclaimable memory and largest free section
-    const char *kind_buf = MMAP_KIND[largest_free_descriptor->kind];
     simple_log("Largest free: %x-%x, Size: %iMB", largest_free_descriptor->start, largest_free_descriptor->start + largest_free_descriptor->size, largest_free_descriptor->size >> 20);
     simple_log("Total free: %iMB", total_free >> 20);
     simple_log("Total reserved: %iMB", total_reserved >> 20);
