@@ -20,9 +20,11 @@ nuke:
 .PHONY: nuke
 
 bootloader:
-	$(MAKE_VARS) $(MAKE) -C boot/efi
+	@echo "UEFI bootloader building..."
+	@$(MAKE_VARS) $(MAKE) -s -C boot/efi
+	@echo "UEFI bootloader built!"
 .PHONY: bootloader
 
 run:
-	$(MAKE_VARS) $(MAKE) -C boot/efi run
+	@$(MAKE_VARS) $(MAKE) -s -C boot/efi run
 .PHONY: run

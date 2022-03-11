@@ -6,11 +6,13 @@ STD_BIN_DIR = $(BIN_DIR)/$(TARGET)/std
 STD_SRC = 	alloc.c \
 			printer.c \
 			printf.c \
+			print_formatters.c \
 			scanner.c
 STD_H =		alloc.h \
 			log.h \
 			printer.h \
 			printf.h \
+			print_formatters.h \
 			scanner.h \
 			std.h
 STD_OBJ = $(patsubst %, $(STD_BIN_DIR)/%.o, $(STD_SRC))

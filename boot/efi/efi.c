@@ -1,15 +1,11 @@
 #include "efi.h"
 
 #include <std/alloc.h>
-#include <std/log.h>
 
 #define BOOTLOADER_PAGES 8
 
 // global system table
 EfiSystemTable *system_table;
-
-// buffer to use for string conversion (from 8bit char to 16bit char) and output to efi console
-EfiChar16 *char16_buf;
 
 // buffer to use for heap allocation
 u8 *efi_heap_buffer_start;
@@ -50,48 +46,20 @@ void efi_free(u8 *_) {
     return;
 }
 
-void efi_set_char16_buf(EfiChar16 *buf) {
-    char16_buf = buf;
+void efi_putc(char c) {
+    EfiChar16 out[2];
+
+    out[0] = (EfiChar16)c;
+    out[1] = '\0';
+
+    system_table->console_out->output_string(system_table->console_out, out);
 }
 
-// convert char8 string to char16 string
-//
-// returned string should be freed when not in use
-EfiChar16 *char8_to_char16(const char *buf) {
-    const char *tmp_buf = buf;
-    size_t count = 0;
-
-    // count characters in string
-    do {
-        ++count;
-    } while (*(buf++) != '\0');
-    buf = tmp_buf;
-
-    // copy characters to char16 string
-    for (size_t i = 0; i < count; ++i) {
-        char16_buf[i] = (EfiChar16)buf[i];
+void efi_puts(const char *str) {
+    while (*str != '\0') {
+        efi_putc(*str);
+        ++str;
     }
-
-    return char16_buf;
-}
-
-// output string (with 16bit chars) to efi console
-void efi_print_str16(EfiChar16 *str) {
-    // EfiStatus status = 
-    system_table->console_out->output_string(system_table->console_out, str);
-    /* TODO: panic bootloader on failure
-    if (status != EFI_SUCCESS) {
-        return status;
-    }
-    */
-
-    // return EFI_SUCCESS;
-}
-
-void efi_output_string(const char *str) {
-    EfiChar16 *buf16 = char8_to_char16(str);
-
-    efi_print_str16(buf16);
 }
 
 // Uses UEFI page allocator to allocate a number of pages.

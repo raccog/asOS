@@ -11,8 +11,6 @@
 #ifndef HW_EFI_H
 #define HW_EFI_H
 
-#include <std/std.h>
-
 // EFIAPI is defined just to follow calling conventions,
 // it is not needed for compilation.
 #define EfiApi __attribute__((ms_abi))
@@ -51,7 +49,7 @@ typedef u64 EfiLba;
 typedef uptr EfiTpl;
 
 // Forward Declaration of System Table
-struct _EfiSystemTable;
+typedef struct _EfiSystemTable EfiSystemTable;
 
 // PE32+ Subsystem type for EFI images
 // Defined in 2.1.1 UEFI Images
@@ -92,7 +90,7 @@ typedef struct {
 
 // Can be used on any device handle to obtain generic path/location information concerning the physical device or logical device.
 // Defined in 10.2 EFI Device Path Protocol
-typedef struct _EfiDevicePathProtocol {
+typedef struct {
     u8 type;
     u8 sub_type;
     u8 length[2];
@@ -144,19 +142,19 @@ typedef struct {
     u32 _reserved;
 } EfiTableHeader;
 
-struct _EfiSimpleTextOutputProtocol;
+typedef struct _EfiSimpleTextOutputProtocol EfiSimpleTextOutputProtocol;
 
 // Simple Text Output Protocol Function Signatures
 // Defined in 12.4 Simple Text Output Protocol
-typedef EfiStatus (EfiApi *EfiTextReset)(struct _EfiSimpleTextOutputProtocol *self, bool extended_verification);
-typedef EfiStatus (EfiApi *EfiTextString)(struct _EfiSimpleTextOutputProtocol *self, EfiChar16 *string);
-typedef EfiStatus (EfiApi *EfiTextTestString)(struct _EfiSimpleTextOutputProtocol *self, EfiChar16 *string);
-typedef EfiStatus (EfiApi *EfiTextQueryMode)(struct _EfiSimpleTextOutputProtocol *self, uptr mode_number, uptr *columns, uptr *rows);
-typedef EfiStatus (EfiApi *EfiTextSetMode)(struct _EfiSimpleTextOutputProtocol *self, uptr mode_number);
-typedef EfiStatus (EfiApi *EfiTextSetAttribute)(struct _EfiSimpleTextOutputProtocol *self, uptr attribute);
-typedef EfiStatus (EfiApi *EfiTextClearScreen)(struct _EfiSimpleTextOutputProtocol *self);
-typedef EfiStatus (EfiApi *EfiTextSetCursorPosition)(struct _EfiSimpleTextOutputProtocol *self, uptr column, uptr row);
-typedef EfiStatus (EfiApi *EfiTextEnableCursor)(struct _EfiSimpleTextOutputProtocol *self, bool visible);
+typedef EfiStatus (EfiApi *EfiTextReset)(EfiSimpleTextOutputProtocol *self, bool extended_verification);
+typedef EfiStatus (EfiApi *EfiTextString)(EfiSimpleTextOutputProtocol *self, EfiChar16 *string);
+typedef EfiStatus (EfiApi *EfiTextTestString)(EfiSimpleTextOutputProtocol *self, EfiChar16 *string);
+typedef EfiStatus (EfiApi *EfiTextQueryMode)(EfiSimpleTextOutputProtocol *self, uptr mode_number, uptr *columns, uptr *rows);
+typedef EfiStatus (EfiApi *EfiTextSetMode)(EfiSimpleTextOutputProtocol *self, uptr mode_number);
+typedef EfiStatus (EfiApi *EfiTextSetAttribute)(EfiSimpleTextOutputProtocol *self, uptr attribute);
+typedef EfiStatus (EfiApi *EfiTextClearScreen)(EfiSimpleTextOutputProtocol *self);
+typedef EfiStatus (EfiApi *EfiTextSetCursorPosition)(EfiSimpleTextOutputProtocol *self, uptr column, uptr row);
+typedef EfiStatus (EfiApi *EfiTextEnableCursor)(EfiSimpleTextOutputProtocol *self, bool visible);
 
 
 // Simple Text Output Mode
@@ -198,7 +196,7 @@ typedef EfiStatus (EfiApi *EfiImageUnload)(EfiHandle image_handle);
 typedef struct {
     u32 revision;
     EfiHandle parent_handle;
-    struct _EfiSystemTable *system_table;
+    EfiSystemTable *system_table;
 
     // Source location of the image
     EfiHandle device_handle;
@@ -225,7 +223,7 @@ typedef struct {
 
 // This protocol is used to control text-based output devices.
 // Defined in 12.4 Simple Text Output Protocol
-typedef struct _EfiSimpleTextOutputProtocol {
+struct _EfiSimpleTextOutputProtocol {
     // Resets the text output device hardware.
     EfiTextReset reset;
     // Writes a string to the output device.
@@ -245,7 +243,7 @@ typedef struct _EfiSimpleTextOutputProtocol {
     // Makes the cursor visible or invisible.
     EfiTextEnableCursor enable_cursor;
     EfiSimpleTextOutputMode *mode;
-} EfiSimpleTextOutputProtocol;
+};
 
 // EFI Device Path Protocol GUID
 // Defined in 10.2 EFI Device Path Protocol
@@ -273,7 +271,7 @@ typedef EfiDevicePathProtocol *(EfiApi *EfiDevicePathUtilsCreateNode)(u8 node_ty
 
 // Creates and manipulates device paths and device nodes.
 // Defined in 10.5 Device Path Utilities Protocol
-typedef struct _EfiDevicePathUtilitiesProtocol {
+typedef struct {
     // Returns the size of the specified device path, in bytes.
     EfiDevicePathUtilsGetDevicePathSize get_device_path_size;
     // Duplicates a device path structure.
@@ -292,11 +290,11 @@ typedef struct _EfiDevicePathUtilitiesProtocol {
     EfiDevicePathUtilsCreateNode create_device_node;
 } EfiDevicePathUtilitiesProtocol;
 
-struct _EfiLoadFileProtocol;
+typedef struct _EfiLoadFileProtocol EfiLoadFileProtocol;
 
 // Load File Protocol Function Signatures
 // Defined in 13.1 Load File Protocol
-typedef EfiStatus (EfiApi *EfiLoadFile)(struct _EfiLoadFileProtocol *this, EfiDevicePathProtocol *file_path, bool boot_policy, uptr *buffer_size, 
+typedef EfiStatus (EfiApi *EfiLoadFile)(EfiLoadFileProtocol *this, EfiDevicePathProtocol *file_path, bool boot_policy, uptr *buffer_size, 
     void *buffer);
 
 // Load File Protocol GUID
@@ -307,14 +305,14 @@ typedef EfiStatus (EfiApi *EfiLoadFile)(struct _EfiLoadFileProtocol *this, EfiDe
 
 // Used to obtain files, that are primarily boot options, from arbitrary devices.
 // Defined in 13.1 Load File Protocol
-typedef struct _EfiLoadFileProtocol {
+struct _EfiLoadFileProtocol {
     // Causes the driver to load a specified file.
     EfiLoadFile load_file;
-} EfiLoadFileProtocol;
+};
 
 // Load File 2 Protocol GUID
 // Defined in 13.2 Load File 2 Protocol
-#define EfiLoadFIle2Protocol \
+#define EfiLoadFile2ProtocolGuid \
     {0x4006c0c1, 0xfcb3, 0x403e, \
     {0x99, 0x6d, 0x4a, 0x6c, 0x87, 0x24, 0xe0, 0x6d}}
 
@@ -326,12 +324,12 @@ typedef EfiLoadFileProtocol EfiLoadFile2Protocol;
 // Defined in 13.2 Load File 2 Protocol
 #define EfiSimpleFileSystemProtocolRevision 0x00010000
 
-struct _EfiSimpleFileSystemProtocol;
-struct _EfiFileProtocol;
+typedef struct _EfiSimpleFileSystemProtocol EfiSimpleFileSystemProtocol;
+typedef struct _EfiFileProtocol EfiFileProtocol;
 
 // Simple File System Protocol Function Signatures
 // Defined in 13.4 Simple File System Protocol
-typedef EfiStatus (EfiApi *EfiSimpleFileSystemProtocolOpenVolume)(struct _EfiSimpleFileSystemProtocol *this, struct _EfiFileProtocol **root);
+typedef EfiStatus (EfiApi *EfiSimpleFileSystemProtocolOpenVolume)(EfiSimpleFileSystemProtocol *this, EfiFileProtocol **root);
 
 // Simple File System Protocol GUID
 // Defined in 13.4 Simple File System Protocol
@@ -341,11 +339,11 @@ typedef EfiStatus (EfiApi *EfiSimpleFileSystemProtocolOpenVolume)(struct _EfiSim
 
 // Provides a minimal interface for file-type access to a device.
 // Defined in 13.4 Simple File System Protocol
-typedef struct _EfiSimpleFileSystemProtocol {
+struct _EfiSimpleFileSystemProtocol {
     u64 revision;
     // Opens the root directory on a volume.
     EfiSimpleFileSystemProtocolOpenVolume open_volume;
-} EfiSimpleFileSystemProtocol;
+};
 
 // File Protocol Revision Numbers
 // Defined in 13.5 File Protocol
@@ -396,22 +394,22 @@ typedef struct {
 
 // File Protocol Function Signatures
 // Defined in 13.5 File Protocol
-typedef EfiStatus (EfiApi *EfiFileOpen)(struct _EfiFileProtocol *this, struct _EfiFileProtocol **new_handle, const EfiChar16 *file_name, u64 open_mode, 
+typedef EfiStatus (EfiApi *EfiFileOpen)(EfiFileProtocol *this, EfiFileProtocol **new_handle, const EfiChar16 *file_name, u64 open_mode, 
     u64 attributes);
-typedef EfiStatus (EfiApi *EfiFileClose)(struct _EfiFileProtocol *this);
-typedef EfiStatus (EfiApi *EfiFileDelete)(struct _EfiFileProtocol *this);
-typedef EfiStatus (EfiApi *EfiFileRead)(struct _EfiFileProtocol *this, uptr *buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiFileWrite)(struct _EfiFileProtocol *this, uptr *buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiFileOpenEx)(struct _EfiFileProtocol *this, struct _EfiFileProtocol **new_handle, const EfiChar16 *file_name, u64 open_mode, 
+typedef EfiStatus (EfiApi *EfiFileClose)(EfiFileProtocol *this);
+typedef EfiStatus (EfiApi *EfiFileDelete)(EfiFileProtocol *this);
+typedef EfiStatus (EfiApi *EfiFileRead)(EfiFileProtocol *this, uptr *buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiFileWrite)(EfiFileProtocol *this, uptr *buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiFileOpenEx)(EfiFileProtocol *this, EfiFileProtocol **new_handle, const EfiChar16 *file_name, u64 open_mode, 
     u64 attributes, EfiFileIoToken *token);
-typedef EfiStatus (EfiApi *EfiFileReadEx)(struct _EfiFileProtocol *this, EfiFileIoToken *token);
-typedef EfiStatus (EfiApi *EfiFileWriteEx)(struct _EfiFileProtocol *this, EfiFileIoToken *token);
-typedef EfiStatus (EfiApi *EfiFileFlushEx)(struct _EfiFileProtocol *this, EfiFileIoToken *token);
-typedef EfiStatus (EfiApi *EfiFileSetPosition)(struct _EfiFileProtocol *this, u64 position);
-typedef EfiStatus (EfiApi *EfiFileGetPosition)(struct _EfiFileProtocol *this, u64 *position);
-typedef EfiStatus (EfiApi *EfiFileGetInfo)(struct _EfiFileProtocol *this, EfiGuid *information_type, uptr *buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiFileSetInfo)(struct _EfiFileProtocol *this, EfiGuid *information_type, uptr buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiFileFlush)(struct _EfiFileProtocol *this);
+typedef EfiStatus (EfiApi *EfiFileReadEx)(EfiFileProtocol *this, EfiFileIoToken *token);
+typedef EfiStatus (EfiApi *EfiFileWriteEx)(EfiFileProtocol *this, EfiFileIoToken *token);
+typedef EfiStatus (EfiApi *EfiFileFlushEx)(EfiFileProtocol *this, EfiFileIoToken *token);
+typedef EfiStatus (EfiApi *EfiFileSetPosition)(EfiFileProtocol *this, u64 position);
+typedef EfiStatus (EfiApi *EfiFileGetPosition)(EfiFileProtocol *this, u64 *position);
+typedef EfiStatus (EfiApi *EfiFileGetInfo)(EfiFileProtocol *this, EfiGuid *information_type, uptr *buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiFileSetInfo)(EfiFileProtocol *this, EfiGuid *information_type, uptr buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiFileFlush)(EfiFileProtocol *this);
 
 // Provides a GUID and a data structure that can be used with EfiFileProtocol.set_info() and EfiFileProtocol.get_info() to set or get generic file information.
 // Defined in 13.5 File Protocol - EFI_FILE_INFO
@@ -453,7 +451,7 @@ typedef struct {
 
 // Provides file based access to supported file systems.
 // Defined in 13.5 File Protocol
-typedef struct _EfiFileProtocol {
+struct _EfiFileProtocol {
     u64 revision;
     // Opens a new file relative to the source file’s location.
     EfiFileOpen open;
@@ -483,14 +481,14 @@ typedef struct _EfiFileProtocol {
     EfiFileWriteEx write_ex;    // added in revision 2
     // Flushes all modified data associated with a file to a device.
     EfiFileFlushEx flush_ex;    // added in revision 2
-} EfiFileProtocol;
+};
 
-struct _EfiDiskIoProtocol;
+typedef struct _EfiDiskIoProtocol EfiDiskIoProtocol;
 
 // Disk I/O Protocol Function Signatures
 // Defined in 13.7 Disk I/O Protocol
-typedef EfiStatus (EfiApi *EfiDiskRead)(struct _EfiDiskIoProtocol *this, u32 media_id, u64 offset, uptr buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiDiskWrite)(struct _EfiDiskIoProtocol *this, u32 media_id, u64 offset, uptr buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiDiskRead)(EfiDiskIoProtocol *this, u32 media_id, u64 offset, uptr buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiDiskWrite)(EfiDiskIoProtocol *this, u32 media_id, u64 offset, uptr buffer_size, void *buffer);
 
 // Disk I/O Protocol Revision Number
 // Defined in 13.7 Disk I/O Protocol
@@ -504,13 +502,13 @@ typedef EfiStatus (EfiApi *EfiDiskWrite)(struct _EfiDiskIoProtocol *this, u32 me
 
 // This protocol is used to abstract Block I/O interfaces.
 // Defined in 13.7 Disk I/O Protocol
-typedef struct _EfiDiskIoProtocol {
+struct _EfiDiskIoProtocol {
     u64 revision;
     // Reads a specified number of bytes from a device.
     EfiDiskRead read_disk;
     // Writes a specified number of bytes to a device.
     EfiDiskWrite write_disk;
-} EfiDiskIoProtocol;
+};
 
 // Disk IO 2 Token
 // Defined in 13.8 Disk I/O 2 Protocol
@@ -519,14 +517,14 @@ typedef struct {
     EfiStatus status;
 } EfiDiskIo2Token;
 
-struct _EfiDiskIo2Protocol;
+typedef struct _EfiDiskIo2Protocol EfiDiskIo2Protocol;
 
 // Disk I/O 2 Protocol Function Signatures
 // Defined in 13.8 Disk I/O 2 Protocol
-typedef EfiStatus (EfiApi *EfiDiskCancelEx)(struct _EfiDiskIo2Protocol *this);
-typedef EfiStatus (EfiApi *EfiDiskReadEx)(struct _EfiDiskIo2Protocol *this, u32 media_id, u64 offset, EfiDiskIo2Token *token, uptr buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiDiskWriteEx)(struct _EfiDiskIo2Protocol *this, u32 media_id, u64 offset, EfiDiskIo2Token *token, uptr buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiDiskFlushEx)(struct _EfiDiskIo2Protocol *this, EfiDiskIo2Token *token);
+typedef EfiStatus (EfiApi *EfiDiskCancelEx)(EfiDiskIo2Protocol *this);
+typedef EfiStatus (EfiApi *EfiDiskReadEx)(EfiDiskIo2Protocol *this, u32 media_id, u64 offset, EfiDiskIo2Token *token, uptr buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiDiskWriteEx)(EfiDiskIo2Protocol *this, u32 media_id, u64 offset, EfiDiskIo2Token *token, uptr buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiDiskFlushEx)(EfiDiskIo2Protocol *this, EfiDiskIo2Token *token);
 
 // Disk I/O 2 Protocol Revision Number
 // Defined in 13.8 Disk I/O 2 Protocol
@@ -540,7 +538,7 @@ typedef EfiStatus (EfiApi *EfiDiskFlushEx)(struct _EfiDiskIo2Protocol *this, Efi
 
 // This protocol is used to abstract Block I/O interfaces in a non-blocking manner.
 // Defined in 13.8 Disk I/O 2 Protocol
-typedef struct _EfiDiskIo2Protocol {
+struct _EfiDiskIo2Protocol {
     u64 revision;
     // Terminate outstanding asynchronous requests to a device.
     EfiDiskCancelEx cancel;
@@ -550,7 +548,7 @@ typedef struct _EfiDiskIo2Protocol {
     EfiDiskWriteEx write_disk_ex;
     // Flushes all modified data to the physical device.
     EfiDiskFlushEx flush_disk_ex;
-} EfiDiskIo2Protocol;
+};
 
 // Block IO Media
 // Defined in 13.9 Block I/O Protocol
@@ -569,14 +567,14 @@ typedef struct {
     u32 optimal_transfer_length_granularity; // added in revision 3
 } EfiBlockIoMedia;
 
-struct _EfiBlockIoProtocol;
+typedef struct _EfiBlockIoProtocol EfiBlockIoProtocol;
 
 // Block I/O Protocol Function Signatures
 // Defined in 13.9 Block I/O Protocol
-typedef EfiStatus (EfiApi *EfiBlockReset)(struct _EfiBlockIoProtocol *this, bool extended_verification);
-typedef EfiStatus (EfiApi *EfiBlockRead)(struct _EfiBlockIoProtocol *this, u32 media_id, EfiLba lba, uptr buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiBlockWrite)(struct _EfiBlockIoProtocol *this, u32 media_id, EfiLba lba, uptr buffer_size, void *buffer);
-typedef EfiStatus (EfiApi *EfiBlockFlush)(struct _EfiBlockIoProtocol *this);
+typedef EfiStatus (EfiApi *EfiBlockReset)(EfiBlockIoProtocol *this, bool extended_verification);
+typedef EfiStatus (EfiApi *EfiBlockRead)(EfiBlockIoProtocol *this, u32 media_id, EfiLba lba, uptr buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiBlockWrite)(EfiBlockIoProtocol *this, u32 media_id, EfiLba lba, uptr buffer_size, void *buffer);
+typedef EfiStatus (EfiApi *EfiBlockFlush)(EfiBlockIoProtocol *this);
 
 // Block I/O Protocol Revision Numbers
 // Defined in 13.9 Block I/O Protocol
@@ -591,7 +589,7 @@ typedef EfiStatus (EfiApi *EfiBlockFlush)(struct _EfiBlockIoProtocol *this);
 
 // This protocol provides control over block devices.
 // Defined in 13.9 Block I/O Protocol
-typedef struct _EfiBlockIoProtocol {
+struct _EfiBlockIoProtocol {
     u64 revision;
     EfiBlockIoMedia *media;
     // Resets the block device hardware.
@@ -602,7 +600,7 @@ typedef struct _EfiBlockIoProtocol {
     EfiBlockWrite write_blocks;
     // Flushes all modified data to a physical block device.
     EfiBlockFlush flush_blocks;
-} EfiBlockIoProtocol;
+};
 
 // Block IO Token 2
 // Defined in 13.10 Block I/O 2 Protocol
@@ -611,16 +609,16 @@ typedef struct {
     EfiStatus transaction_status;
 } EfiBlockIo2Token;
 
-struct _EfiBlockIo2Protocol;
+typedef struct _EfiBlockIo2Protocol EfiBlockIo2Protocol;
 
 // Block I/O 2 Protocol Function Signatures
 // Defined in 13.10 Block I/O 2 Protocol
-typedef EfiStatus (EfiApi *EfiBlockResetEx)(struct _EfiBlockIo2Protocol *this, bool extended_verification);
-typedef EfiStatus (EfiApi *EfiBlockReadEx)(struct _EfiBlockIo2Protocol *this, u32 media_id, EfiLba lba, EfiBlockIo2Token *token, uptr buffer_size, 
+typedef EfiStatus (EfiApi *EfiBlockResetEx)(EfiBlockIo2Protocol *this, bool extended_verification);
+typedef EfiStatus (EfiApi *EfiBlockReadEx)(EfiBlockIo2Protocol *this, u32 media_id, EfiLba lba, EfiBlockIo2Token *token, uptr buffer_size, 
     void *buffer);
-typedef EfiStatus (EfiApi *EfiBlockWriteEx)(struct _EfiBlockIo2Protocol *this, u32 media_id, EfiLba lba, EfiBlockIo2Token *token, uptr buffer_size, 
+typedef EfiStatus (EfiApi *EfiBlockWriteEx)(EfiBlockIo2Protocol *this, u32 media_id, EfiLba lba, EfiBlockIo2Token *token, uptr buffer_size, 
     void *buffer);
-typedef EfiStatus (EfiApi *EfiBlockFlushEx)(struct _EfiBlockIo2Protocol *this, EfiBlockIo2Token *token);
+typedef EfiStatus (EfiApi *EfiBlockFlushEx)(EfiBlockIo2Protocol *this, EfiBlockIo2Token *token);
 
 // Block I/O 2 Protocol GUID
 // Defined in 13.10 Block I/O 2 Protocol
@@ -630,7 +628,7 @@ typedef EfiStatus (EfiApi *EfiBlockFlushEx)(struct _EfiBlockIo2Protocol *this, E
 
 // This protocol provides control over block devices.
 // Defined in 13.10 Block I/O 2 Protocol
-typedef struct _EfiBlockIo2Protocol {
+struct _EfiBlockIo2Protocol {
     EfiBlockIoMedia *media;
     // Resets the block device hardware.
     EfiBlockResetEx reset;
@@ -640,7 +638,7 @@ typedef struct _EfiBlockIo2Protocol {
     EfiBlockWriteEx write_blocks_ex;
     // Flushes all modified data to a physical block device.
     EfiBlockFlushEx flush_blocks_ex;
-} EfiBlockIo2Protocol;
+};
 
 // Erase Block Token
 // Defined in 13.12 Erase Block Protocol
@@ -649,11 +647,11 @@ typedef struct {
     EfiStatus transaction_status;
 } EfiEraseBlockToken;
 
-struct _EfiEraseBlockProtocol;
+typedef struct _EfiEraseBlockProtocol EfiEraseBlockProtocol;
 
 // Erase Block Protocol Function Signatures
 // Defined in 13.12 Erase Block Protocol
-typedef EfiStatus (EfiApi *EfiBlockErase)(struct _EfiEraseBlockProtocol *this, u32 media_id, EfiLba lba, EfiEraseBlockToken *token, uptr size);
+typedef EfiStatus (EfiApi *EfiBlockErase)(EfiEraseBlockProtocol *this, u32 media_id, EfiLba lba, EfiEraseBlockToken *token, uptr size);
 
 // Erase Block Protocol Revision Number
 // Defined in 13.12 Erase Block Protocol
@@ -668,12 +666,12 @@ typedef EfiStatus (EfiApi *EfiBlockErase)(struct _EfiEraseBlockProtocol *this, u
 // This protocol provides the ability for a device to expose erase functionality. This optional protocol is installed on the same handle as the 
 // EfiBlockIoProtocol or EfiBlockIo2Protocol.
 // Defined in 13.12 Erase Block Protocol
-typedef struct _EfiEraseBlockProtocol {
+struct _EfiEraseBlockProtocol {
     u64 revision;
     u32 erase_length_granularity;
     // Erase a specified number of device blocks.
     EfiBlockErase erase_blocks;
-} EfiEraseBlockProtocol;
+};
 
 // ATA Pass Thru Protocol Attributes
 // Defined in 13.13 ATA Pass Thru Protocol
@@ -772,20 +770,20 @@ typedef struct {
     EfiAtaPassThruLength length;
 } EfiAtaPassThruCommandPacket;
 
-struct _EfiAtaPassThruProtocol;
+typedef struct _EfiAtaPassThruProtocol EfiAtaPassThruProtocol;
 
 // ATA Pass Thru Protocol Function Signatures
 // Defined in 13.13 ATA Pass Thru Protocol
-typedef EfiStatus (EfiApi *EfiAtaPassThruPassThru)(struct _EfiAtaPassThruProtocol *this, u16 port, u16 port_multiplier_port,
+typedef EfiStatus (EfiApi *EfiAtaPassThruPassThru)(EfiAtaPassThruProtocol *this, u16 port, u16 port_multiplier_port,
     EfiAtaPassThruCommandPacket *packet, EfiEvent event);
-typedef EfiStatus (EfiApi *EfiAtaPassThruGetNextPort)(struct _EfiAtaPassThruProtocol *this, u16 *port);
-typedef EfiStatus (EfiApi *EfiAtaPassThruGetNextDevice)(struct _EfiAtaPassThruProtocol *this, u16 port, u16 *port_multipler_port);
-typedef EfiStatus (EfiApi *EfiAtaPassThruBuildDevicePath)(struct _EfiAtaPassThruProtocol *this, u16 port, u16 port_multipler_port,
+typedef EfiStatus (EfiApi *EfiAtaPassThruGetNextPort)(EfiAtaPassThruProtocol *this, u16 *port);
+typedef EfiStatus (EfiApi *EfiAtaPassThruGetNextDevice)(EfiAtaPassThruProtocol *this, u16 port, u16 *port_multipler_port);
+typedef EfiStatus (EfiApi *EfiAtaPassThruBuildDevicePath)(EfiAtaPassThruProtocol *this, u16 port, u16 port_multipler_port,
     EfiDevicePathProtocol **device_path);
-typedef EfiStatus (EfiApi *EfiAtaPassThruGetDevice)(struct _EfiAtaPassThruProtocol *this, EfiDevicePathProtocol *device_path, u16 *port,
+typedef EfiStatus (EfiApi *EfiAtaPassThruGetDevice)(EfiAtaPassThruProtocol *this, EfiDevicePathProtocol *device_path, u16 *port,
     u16 *port_multiplier_port);
-typedef EfiStatus (EfiApi *EfiAtaPassThruResetPort)(struct _EfiAtaPassThruProtocol *this, u16 port);
-typedef EfiStatus (EfiApi *EfiAtaPassThruResetDevice)(struct _EfiAtaPassThruProtocol *this, u16 port, u16 port_multiplier_port);
+typedef EfiStatus (EfiApi *EfiAtaPassThruResetPort)(EfiAtaPassThruProtocol *this, u16 port);
+typedef EfiStatus (EfiApi *EfiAtaPassThruResetDevice)(EfiAtaPassThruProtocol *this, u16 port, u16 port_multiplier_port);
 
 // ATA Pass Thru Protocol GUID
 // Defined in 13.13 ATA Pass Thru Protocol
@@ -795,7 +793,7 @@ typedef EfiStatus (EfiApi *EfiAtaPassThruResetDevice)(struct _EfiAtaPassThruProt
 
 // Provides services that allow ATA commands to be sent to ATA Devices attached to an ATA controller.
 // Defined in 13.13 ATA Pass Thru Protocol
-typedef struct _EfiAtaPassThruProtocol {
+struct _EfiAtaPassThruProtocol {
     EfiAtaPassThruMode *mode;
     // Sends an ATA command to an ATA device that is attached to the ATA controller. This function supports both blocking I/O and non-blocking I/O. The
     // blocking I/O functionality is required, and the non-blocking I/O functionality is optional.
@@ -816,7 +814,7 @@ typedef struct _EfiAtaPassThruProtocol {
     EfiAtaPassThruResetPort reset_port;
     // Resets an ATA device that is connected to an ATA controller.
     EfiAtaPassThruResetDevice reset_device;
-} EfiAtaPassThruProtocol;
+};
 
 // NVM Express Pass Through Protocol Attributes
 // Defined in 13.15 NVM Express Pass Through Protocol
@@ -896,16 +894,16 @@ typedef struct {
     EfiNvmExpressCompletion *nvmd_completion;
 } EfiNvmExpressPassThruCommandPacket;
 
-struct _EfiNvmExpressPassThruProtocol;
+typedef struct _EfiNvmExpressPassThruProtocol EfiNvmExpressPassThruProtocol;
 
 // NVM Express Pass Through Protocol Function Signatures
 // Defined in 13.15 NVM Express Pass Through Protocol
-typedef EfiStatus (EfiApi *EfiNvmExpressPassThruPassThru)(struct _EfiNvmExpressPassThruProtocol *this, u32 namespace_id,
+typedef EfiStatus (EfiApi *EfiNvmExpressPassThruPassThru)(EfiNvmExpressPassThruProtocol *this, u32 namespace_id,
     EfiNvmExpressPassThruCommandPacket *packet, EfiEvent event);
-typedef EfiStatus (EfiApi *EfiNvmExpressPassThruGetNextNamespace)(struct _EfiNvmExpressPassThruProtocol *this, u32 *namespace_id);
-typedef EfiStatus (EfiApi *EfiNvmExpressPassThruBuildDevicePath)(struct _EfiNvmExpressPassThruProtocol *this, u32 namespace_id,
+typedef EfiStatus (EfiApi *EfiNvmExpressPassThruGetNextNamespace)(EfiNvmExpressPassThruProtocol *this, u32 *namespace_id);
+typedef EfiStatus (EfiApi *EfiNvmExpressPassThruBuildDevicePath)(EfiNvmExpressPassThruProtocol *this, u32 namespace_id,
     EfiDevicePathProtocol **device_path);
-typedef EfiStatus (EfiApi *EfiNvmExpressPassThruGetNamespace)(struct _EfiNvmExpressPassThruProtocol *this, EfiDevicePathProtocol *device_path, u32 *namespace_id);
+typedef EfiStatus (EfiApi *EfiNvmExpressPassThruGetNamespace)(EfiNvmExpressPassThruProtocol *this, EfiDevicePathProtocol *device_path, u32 *namespace_id);
 
 // NVM Express Pass Through Protocol GUID
 // Defined in 13.15 NVM Express Pass Through Protocol
@@ -916,7 +914,7 @@ typedef EfiStatus (EfiApi *EfiNvmExpressPassThruGetNamespace)(struct _EfiNvmExpr
 // his protocol provides services that allow NVM Express commands to be sent to an NVM Express controller or to a specific namespace in a NVM Express
 // controller. This protocol interface is optimized for storage.
 // Defined in 13.15 NVM Express Pass Through Protocol
-typedef struct _EfiNvmExpressPassThruProtocol {
+struct _EfiNvmExpressPassThruProtocol {
     EfiNvmExpressPassThruMode *mode;
     // Sends an NVM Express Command Packet to an NVM Express controller or namespace. This function supports both blocking I/O and non-blocking I/O. The
     // blocking I/O functionality is required, and the non- blocking I/O functionality is optional.
@@ -927,11 +925,11 @@ typedef struct _EfiNvmExpressPassThruProtocol {
     EfiNvmExpressPassThruBuildDevicePath build_device_path;
     // Used to translate a device path node to a namespace ID.
     EfiNvmExpressPassThruGetNamespace get_namespace;
-} EfiNvmExpressPassThruProtocol;
+};
 
 // Memory Descriptor
 // Defined in 7.2 Memory Allocation Services - EFI_BOOT_SERVICES.GetMemoryMap()
-typedef struct _EfiMemoryDescriptor {
+typedef struct {
     u32 type;
     u32 _pad1;
     EfiPhysicalAddress physical_start;
@@ -970,11 +968,12 @@ typedef struct {
 // Defined in 7.2 Memory Allocation Services
 typedef EfiStatus (EfiApi *EfiAllocatePages)(EfiAllocateType type, EfiMemoryType memory_type, uptr pages, EfiPhysicalAddress *memory);
 typedef EfiStatus (EfiApi *EfiFreePages)(EfiPhysicalAddress memory, uptr pages);
-typedef EfiStatus (EfiApi *EfiGetMemoryMap)(uptr *memory_map_size, struct _EfiMemoryDescriptor *memory_map, uptr *map_key, uptr *descriptor_size,
+typedef EfiStatus (EfiApi *EfiGetMemoryMap)(uptr *memory_map_size, EfiMemoryDescriptor *memory_map, uptr *map_key, uptr *descriptor_size,
     u32 *descriptor_version);
-typedef EfiStatus (EfiApi *EfiSetWatchdogTimer)(uptr timeout, u64 code, uptr data_size, EfiChar16 *data);
+typedef EfiStatus (EfiApi *EfiAllocatePool)(EfiMemoryType pool_type, uptr size, void **buffer);
+typedef EfiStatus (EfiApi *EfiFreePool)(void *buffer);
 
-// Protocol Handler Services Function Services
+// Protocol Handler Services Function Signatures
 // Defined in 7.3 Protocol Handler Services
 typedef EfiStatus (EfiApi *EfiInstallProtocolInterface)(EfiHandle *handle, EfiGuid *protocol, EfiInterfaceType interface_type, void *interface);
 typedef EfiStatus (EfiApi *EfiUninstallProtocolInterface)(EfiHandle handle, EfiGuid *protocol, void *interface);
@@ -995,6 +994,10 @@ typedef EfiStatus (EfiApi *EfiLocateHandleBuffer)(EfiLocateSearchType search_typ
 typedef EfiStatus (EfiApi *EfiLocateProtocol)(EfiGuid *protocol, void *registration, void **interface);
 typedef EfiStatus (EfiApi *EfiInstallMultipleProtocolInterfaces)(EfiHandle *handle, ...);
 typedef EfiStatus (EfiApi *EfiUninstallMultipleProtocolInterfaces)(EfiHandle handle);
+
+// Miscellaneous Boot Services Function Signatures
+// Defined in 7.5 Miscellaneous Boot Services
+typedef EfiStatus (EfiApi *EfiSetWatchdogTimer)(uptr timeout, u64 code, uptr data_size, EfiChar16 *data);
 
 // Boot Services Definitions
 // Defined in 4.4 EFI Boot Services Table
@@ -1030,9 +1033,9 @@ typedef struct {
     // Returns the current memory map.
     EfiGetMemoryMap get_memory_map;
     // Allocates pool memory.
-    void *allocate_pool;
+    EfiAllocatePool allocate_pool;
     // Returns pool memory to the system.
-    void *free_pool;
+    EfiFreePool free_pool;
 
     /* 
      * ############################
@@ -1194,7 +1197,7 @@ typedef struct {
 
 // Contains pointers to the runtime and boot services tables.
 // Defined in 4.3 EFI System Table
-typedef struct _EfiSystemTable {
+struct _EfiSystemTable {
 	EfiTableHeader header;
 	EfiChar16 *firmware_vendor;
 	u32 firmware_revision;
@@ -1208,7 +1211,7 @@ typedef struct _EfiSystemTable {
 	EfiBootServices *boot_services;
 	uptr num_table_entries;
 	void *config_table;  // config table pointer
-} EfiSystemTable;
+};
 
 // This is the main entry point for a UEFI Image.
 // Defined in 4.1 UEFI Image Entry Point

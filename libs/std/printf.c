@@ -2,7 +2,6 @@
 #include <std/scanner.h>
 #include <std/printer.h>
 #include <std/printf.h>
-#include <std/std.h>
 
 // print buffer
 char *print_buffer;
@@ -143,7 +142,7 @@ void simple_printf(const char *fmt, ...) {
     scanner_put_char(&scanner, '\0');
 
     // output string and free buffer
-    printer().output_string(scanner.out_buf);
+    printer().puts(scanner.out_buf);
     alloc().free((u8 *)scanner.out_buf);
 
     va_end(args);

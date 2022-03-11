@@ -1,7 +1,5 @@
 #include <std/alloc.h>
 
-#include <std/log.h>
-
 // memory for global allocator
 Allocator _allocator;
 

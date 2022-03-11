@@ -1,8 +1,6 @@
 #ifndef STD_SCANNER_H
 #define STD_SCANNER_H
 
-#include <std/std.h>
-
 // Scanner contains input and output buffers and maintains separate indices for each
 typedef struct {
     const char *in_buf;

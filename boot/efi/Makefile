@@ -1,5 +1,5 @@
 TARGET = x86_64-pc-unknown-windows
-CFLAGS = -ffreestanding -fno-stack-protector -fshort-wchar -mno-red-zone -Wall
+CFLAGS = -ffreestanding -fno-stack-protector -fshort-wchar -mno-red-zone -Wall -include $(ROOT_DIR)/libs/std/prelude.h
 
 include $(MAKE_DIR)/*.mk
 
@@ -32,8 +32,9 @@ all: $(BOOT_X64_LIB)
 .PHONY: all
 
 run: $(BOOT_X64_LIB) $(OVMF_SRC)
-	@mkdir -p $(BIN_DIR)/sysroot/EFI/BOOT
-	@cp $< $(BIN_DIR)/sysroot/EFI/BOOT
+	echo "UEFI bootloader running..."
+	mkdir -p $(BIN_DIR)/sysroot/EFI/BOOT
+	cp $< $(BIN_DIR)/sysroot/EFI/BOOT
 	qemu-system-x86_64 \
 		-nographic \
 		-bios $(OVMF_SRC) \
@@ -43,7 +44,7 @@ run: $(BOOT_X64_LIB) $(OVMF_SRC)
 .PHONY: run
 
 $(OVMF_SRC):
-	@$(MKCWD)
+	$(MKCWD)
 	wget https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd
 	mv DEBUGX64_OVMF.fd $@
 
@@ -51,14 +52,18 @@ $(BOOT_X64_LIB): $(BOOT_X64_OBJ) $(BOOT_X64_LIB_DEPS)
 	$(MKCWD)
 	$(BOOT_X64_LD) $(BOOT_X64_LDFLAGS) -out:$@ $^
 
-$(BOOT_X64_BIN_DIR)/%.c.o: %.c
+$(BOOT_X64_BIN_DIR)/%.c.o: %.c $(BOOT_X64_LIB_DEPS)
 	$(MKCWD)
 	$(BOOT_X64_CC) $(BOOT_X64_CFLAGS) -c -o $@ $<
 
 $(STD_LIB):
-	$(MAKE_VARS) $(MAKE) -C $(ROOT_DIR)/libs/std
+	echo "Stdlib building for target: $(TARGET)..."
+	$(MAKE_VARS) $(MAKE) -s -C $(ROOT_DIR)/libs/std
+	echo "Stdlib build!"
 .PHONY: $(STD_LIB)
 
 $(HW_LIB):
-	$(MAKE_VARS) $(MAKE) -C $(ROOT_DIR)/libs/hw
+	echo "Hardware lib building for target: $(TARGET)..."
+	$(MAKE_VARS) $(MAKE) -s -C $(ROOT_DIR)/libs/hw
+	echo "Hardware lib built!"
 .PHONY: $(HW_LIB)

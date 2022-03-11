@@ -1,8 +1,6 @@
 #ifndef STD_ALLOC_H
 #define STD_ALLOC_H
 
-#include <std/std.h>
-
 typedef bool (*AllocateFunc)(u8 **ptr, size_t bytes);
 typedef void (*FreeFunc)(u8 *ptr);
 

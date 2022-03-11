@@ -1,7 +1,6 @@
 #include <hw/mmap.h>
 
 #include <std/alloc.h>
-#include <std/log.h>
 
 // Memory descriptor type strings
 const char *MMAP_KIND[] = {

@@ -2,7 +2,6 @@
 #define HW_MMAP_H
 
 #include <hw/efi/efi.h>
-#include <std/std.h>
 
 // TODO: Support 32bit addressing
 typedef u64 OSMemoryAddress;
