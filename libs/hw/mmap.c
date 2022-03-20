@@ -3,7 +3,7 @@
 #include <std/alloc.h>
 
 // Memory descriptor type strings
-const char *MMAP_KIND[] = {
+static const char *MMAP_KIND[] = {
     "Free",
     "Reclaimable",
     "Reserved",

@@ -4,6 +4,8 @@
 // Format variables into a string and print out the formatted string
 void simple_printf(const char *fmt, ...);
 
+void simple_printf$(const char *fmt, ...);
+
 // Sets the print buffer
 //
 // This buffer should already be allocated.

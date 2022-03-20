@@ -100,49 +100,19 @@ EfiStatus EfiApi efi_main(EfiHandle image_handle, EfiSystemTable *st) {
     simple_log("Image base: %x", loaded_image->image_base);
     simple_log("Image size: %x", loaded_image->image_size);
 
-    // Test integer printer
-    simple_log("Testing function print_int$() ...");
-    OutputStringFunc puts = printer().puts;
-    puts("Should be 0: ");
-    print_int$(0);
-    puts("Should be 10: ");
-    print_int$(10);
-    puts("Should be 7: ");
-    print_int$(7);
-    puts("Should be 5827462: ");
-    print_int$(5827462);
-    puts("Should be 1234567890: ");
-    print_int$(1234567890);
-    puts("Should be -1234567890: ");
-    print_int$(-1234567890);
-    simple_log("print_int$() test complete.");
-
-    simple_log("Testing function print_long$() ...");
-    puts("Should be 10: ");
-    print_long$(10);
-    puts("Should be 7: ");
-    print_long$(7);
-    puts("Should be 5827462: ");
-    print_long$(5827462);
-    puts("Should be 1234567890: ");
-    print_long$(1234567890);
-    puts("Should be -1234567890: ");
-    print_long$(-1234567890);
-    puts("Should be 10000000000: ");
-    print_long$(10000000000);
-    puts("Should be -12345678901234567: ");
-    print_long$(-12345678901234567);
-    simple_log("print_long$() test complete.");
-
-    simple_log("Testing function print_int_unsigned$() ...");
-    puts("Should be 4294967295: ");
-    print_int_unsigned$(4294967295);
-    simple_log("print_int_unsigned$() test complete.");
-
-    simple_log("Testing function print_long_unsigned$() ...");
-    puts("Should be 18446744073709551615: ");
-    print_long_unsigned$(18446744073709551615ul);
-    simple_log("print_long_unsigned$() test complete.");
+    // test simple_printf
+    simple_log("Testing simple_printf$() ...");
+    simple_printf$("Should be 0: %i", 0);
+    simple_printf$("Should be 10: %i", 10);
+    simple_printf$("Should be 7: %d", 7);
+    simple_printf$("Should be 5827462: %i", 5827462);
+    simple_printf$("Should be 1234567890: %i", 1234567890);
+    simple_printf$("Should be -1234567890: %i", -1234567890);
+    simple_printf$("Should be 10000000000: %il", 10000000000l);
+    simple_printf$("Should be -12345678901234567: %il", -12345678901234567l);
+    simple_printf$("Should be 0x0123456789abcdef: %p", 0x0123456789abcdef);
+    simple_printf$("Should be 0xdeadbeef: %x", 0xdeadbeef);
+    simple_log("simple_printf$() test complete.");
 
     // infinite loop will be replaced with calling the OS entry point
     while (true) {}

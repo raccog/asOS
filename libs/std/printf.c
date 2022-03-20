@@ -1,13 +1,14 @@
 #include <std/alloc.h>
 #include <std/scanner.h>
 #include <std/printer.h>
+#include <std/print_formatters.h>
 #include <std/printf.h>
 
 // print buffer
-char *print_buffer;
+static char *print_buffer;
 
 // print a 32bit unsigned integer as hexadecimal
-void print_hex(Scanner *scanner, int value) {
+static void print_hex(Scanner *scanner, int value) {
     scanner_put_char(scanner, '0');
     scanner_put_char(scanner, 'x');
 
@@ -22,7 +23,7 @@ void print_hex(Scanner *scanner, int value) {
 }
 
 // print a 64bit address pointer
-void print_ptr(Scanner *scanner, long value) {
+static void print_ptr(Scanner *scanner, long value) {
     scanner_put_char(scanner, '0');
     scanner_put_char(scanner, 'x');
 
@@ -37,7 +38,7 @@ void print_ptr(Scanner *scanner, long value) {
 }
 
 // print a 32bit signed integer
-void print_int(Scanner *scanner, int value) {
+static void print_int(Scanner *scanner, int value) {
     size_t digits = 1;
     int divisor;
 
@@ -61,7 +62,7 @@ void print_int(Scanner *scanner, int value) {
 }
 
 // print a null-terminated string
-void print_str(Scanner *scanner, const char *str) {
+static void print_str(Scanner *scanner, const char *str) {
     while (*str != '\0') {
         scanner_put_char(scanner, *str);
         ++str;
@@ -69,7 +70,7 @@ void print_str(Scanner *scanner, const char *str) {
 }
 
 // print a 32bit unsigned integer as a bit string
-void print_bits(Scanner *scanner, int value) {
+static void print_bits(Scanner *scanner, int value) {
     char c;
 
     scanner_put_char(scanner, '0');
@@ -148,7 +149,65 @@ void simple_printf(const char *fmt, ...) {
     va_end(args);
 }
 
-void set_print_buffer(char *buf) {
+void simple_printf$(const char *fmt, ...) {
+    va_list args;
+    char c;
+
+    va_start(args, fmt);
+
+    while ((c = *fmt++) != '\0') {
+        if (c == '%') {
+            c = *fmt++;
+            switch (c) {
+                case 'c':
+                    printer().putc((char)va_arg(args, i32));
+                    break;
+                case 'i':
+                case 'd':
+                    if (*fmt == 'l') {
+                        ++fmt;
+                        print_long$(va_arg(args, i64));
+                    } else {
+                        print_int$(va_arg(args, i32));
+                    }
+                    break;
+                case 's':
+                    printer().puts(va_arg(args, const char *));
+                    break;
+                case 'u':
+                    if (*fmt == 'l') {
+                        ++fmt;
+                        print_long_unsigned$(va_arg(args, u64));
+                    } else {
+                        print_int_unsigned$(va_arg(args, u32));
+                    }
+                    break;
+                case 'x':
+                    if (*fmt == 'l') {
+                        ++fmt;
+                        print_hex64$(va_arg(args, u64));
+                    } else {
+                        print_hex32$(va_arg(args, u32));
+                    }
+                    break;
+                case 'p':
+                    print_hex64$((u64)va_arg(args, void *));
+                    break;
+                case '%':
+                default:
+                    printer().putc(c);
+            }
+        } else {
+            printer().putc(c);
+        }
+    }
+
+    printer().putc('\n');   // TODO: remove this line. just for testing
+
+    va_end(args);
+}
+
+static void set_print_buffer(char *buf) {
     print_buffer = buf;
 }
 
