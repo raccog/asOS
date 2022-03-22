@@ -1,8 +1,8 @@
 # Always Sunny OS
 
-asOS (Always Sunny Operating System) is my solo hobby OS project (though feedback is always welcome :D).
+asOS (Always Sunny Operating System) is a UEFI application that prints the memory map of an x86_64 system.
 
-Currently, I am working on the custom UEFI bootloader.
+It was planned to be a full bootloader and operating system, but I have since remade the project [here](https://github.com/raccog/lionturtle-os).
 
 ## Build Instructions
 
